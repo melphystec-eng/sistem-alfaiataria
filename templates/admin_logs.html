@@ -1,0 +1,34 @@
+{% extends "base.html" %}{% block title %}Registo{% endblock %}
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+  <h1><i class="fa-solid fa-list-check" style="color: var(--azul);"></i> Registo de Atividades</h1>
+
+  <form method="get" style="margin: 0;">
+    <select name="acao" onchange="this.form.submit()" style="width: 250px; padding: 10px; margin: 0;">
+      <option value="">— Filtrar por ação —</option>
+      {% for a in acoes %}
+      <option value="{{ a }}" {% if a==filtro %}selected{% endif %}>{{ a }}</option>
+      {% endfor %}
+    </select>
+  </form>
+</div>
+
+<table>
+<thead>
+  <tr><th>Data</th><th>Admin</th><th>Ação</th><th>Detalhe</th><th>IP</th></tr>
+</thead>
+<tbody>
+{% for l in logs %}
+<tr>
+  <td data-label="Data"><small>{{ l.data.replace('T', ' ') }}</small></td>
+  <td data-label="Admin"><b>{{ l.admin_user or 'Visitante' }}</b></td>
+  <td data-label="Ação"><code>{{ l.acao }}</code></td>
+  <td data-label="Detalhe">{{ l.detalhe or '-' }}</td>
+  <td data-label="IP"><small>{{ l.ip or '-' }}</small></td>
+</tr>
+{% else %}
+<tr><td colspan="5" style="text-align:center; padding: 30px; color: var(--cinza-500);">Sem registos.</td></tr>
+{% endfor %}
+</tbody>
+</table>
+{% endblock %}

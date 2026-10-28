@@ -1,0 +1,27 @@
+{% extends "base.html" %}{% block title %}Alterar Senha{% endblock %}
+{% block content %}
+<div class="card" style="max-width: 500px; margin: 0 auto;">
+  <h1><i class="fa-solid fa-key" style="color: var(--azul);"></i> Alterar Senha</h1>
+  <form method="post">
+
+    <div class="form-group">
+      <label><i class="fa-solid fa-lock"></i> Senha Atual</label>
+      <input type="password" name="atual" required placeholder="A sua senha atual">
+    </div>
+
+    <div class="form-group">
+      <label><i class="fa-solid fa-lock-open"></i> Nova Senha</label>
+      <input type="password" name="nova" required placeholder="Mínimo 6 caracteres">
+    </div>
+
+    <div class="form-group">
+      <label><i class="fa-solid fa-check-double"></i> Confirmar Nova Senha</label>
+      <input type="password" name="confirmar" required placeholder="Repita a nova senha">
+    </div>
+
+    <div style="display: flex; gap: 10px; margin-top: 25px;">
+      <button type="submit"><i class="fa-solid fa-shield-halved"></i> Guardar Nova Senha</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

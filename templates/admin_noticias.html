@@ -1,0 +1,29 @@
+{% extends "base.html" %}{% block title %}Notícias{% endblock %}
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center;">
+  <h1><i class="fa-solid fa-newspaper" style="color: var(--azul);"></i> Notícias</h1>
+  <a href="{{ url_for('admin_noticia_nova') }}" class="btn"><i class="fa-solid fa-plus"></i> Nova Notícia</a>
+</div>
+
+<table>
+<thead>
+  <tr><th>Título</th><th>Data</th><th>👁️</th><th>👍</th><th>👎</th><th style="text-align: right;">Ações</th></tr>
+</thead>
+<tbody>
+{% for n in noticias %}
+<tr>
+  <td data-label="Título"><a href="{{ url_for('ver_noticia', id=n.id) }}">{{ n.titulo }}</a></td>
+  <td data-label="Data">{{ n.criada_em[:10] }}</td>
+  <td data-label="👁️">{{ n.visualizacoes }}</td>
+  <td data-label="👍">{{ n.likes }}</td>
+  <td data-label="👎">{{ n.dislikes }}</td>
+  <td data-label="Ações" style="text-align: right;">
+    <form method="post" action="{{ url_for('admin_noticia_apagar', id=n.id) }}" onsubmit="return confirm('Apagar?')" style="display:inline">
+      <button class="btn-danger btn-sm"><i class="fa-solid fa-trash"></i></button>
+    </form>
+  </td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+{% endblock %}

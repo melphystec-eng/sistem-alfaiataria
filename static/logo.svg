@@ -1,0 +1,53 @@
+<!-- LOGOTIPO SVG - Alfaiataria Mário Calandula -->
+<svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg" style="max-width: 100%; height: auto;">
+  <!-- Círculo Exterior Branco -->
+  <circle cx="250" cy="250" r="240" fill="#ffffff" stroke="#000000" stroke-width="8"/>
+
+  <!-- Círculo Interior Ciano -->
+  <circle cx="250" cy="250" r="175" fill="#00E5FF"/>
+
+  <!-- Caminho para Texto Superior -->
+  <path id="top-curve" d="M 80 250 A 170 170 0 0 1 420 250" fill="transparent"/>
+  <!-- Texto Superior -->
+  <text font-family="'Times New Roman', serif" font-size="32" font-weight="bold" fill="#000" letter-spacing="1">
+    <textPath href="#top-curve" startOffset="50%" text-anchor="middle">A Solução da Sua Roupa E</textPath>
+  </text>
+
+  <!-- Caminho para Texto Inferior -->
+  <path id="bottom-curve" d="M 420 250 A 170 170 0 0 1 80 250" fill="transparent"/>
+  <!-- Texto Inferior -->
+  <text font-family="'Times New Roman', serif" font-size="34" font-weight="bold" fill="#000">
+    <textPath href="#bottom-curve" startOffset="50%" text-anchor="middle">Alfaiataria Mário Calandula</textPath>
+  </text>
+
+  <!-- Iniciais M. A. C. -->
+  <text x="250" y="150" font-family="'Times New Roman', serif" font-size="48" font-weight="bold" fill="#000" text-anchor="middle" letter-spacing="8">M. A. C.</text>
+
+  <!-- Máquina de Costura (Desenho Vetorial Simplificado) -->
+  <g transform="translate(125, 180) scale(0.9)">
+    <!-- Base de Madeira -->
+    <rect x="30" y="130" width="180" height="25" fill="#D4A373" rx="5"/>
+    <rect x="20" y="155" width="200" height="15" fill="#8B5A2B" rx="3"/>
+
+    <!-- Corpo Principal da Máquina -->
+    <path d="M 50 130 L 50 90 C 50 60 70 40 110 40 L 140 40 C 170 40 180 60 180 90 L 180 100 C 180 120 160 130 140 130 Z" fill="#000000"/>
+
+    <!-- Braço Direito / Volante -->
+    <path d="M 180 90 C 200 90 210 110 200 130 L 180 130 Z" fill="#000000"/>
+    <circle cx="195" cy="105" r="12" fill="#666666" stroke="#000" stroke-width="2"/>
+
+    <!-- Agulha / Cabeça -->
+    <path d="M 70 130 L 70 160 L 80 160 L 80 130 Z" fill="#000000"/>
+    <line x1="75" y1="160" x2="75" y2="180" stroke="#999" stroke-width="3"/>
+
+    <!-- Detalhes / Reflexos -->
+    <path d="M 60 90 C 60 70 70 55 100 50" stroke="#ffffff" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <path d="M 150 50 C 165 55 170 70 170 85" stroke="#ffffff" stroke-width="3" fill="none" stroke-linecap="round"/>
+
+    <!-- Detalhe de linha na base -->
+    <ellipse cx="100" cy="140" rx="40" ry="5" fill="#ffffff" opacity="0.3"/>
+  </g>
+
+  <!-- Informações de Contacto -->
+  <text x="250" y="320" font-family="'Arial', sans-serif" font-size="16" font-weight="bold" fill="#000" text-anchor="middle">Huíla - Lubango / Arimba Telef: 928941415</text>
+</svg>

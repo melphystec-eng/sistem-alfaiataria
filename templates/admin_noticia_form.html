@@ -1,0 +1,28 @@
+{% extends "base.html" %}{% block title %}Nova Notícia{% endblock %}
+{% block content %}
+<div class="card" style="max-width: 700px; margin: 0 auto;">
+  <h1><i class="fa-solid fa-pen-to-square" style="color: var(--azul);"></i> Nova Notícia</h1>
+  <form method="post" enctype="multipart/form-data">
+
+    <div class="form-group">
+      <label><i class="fa-solid fa-heading"></i> Título</label>
+      <input name="titulo" required placeholder="Escreva o título da notícia...">
+    </div>
+
+    <div class="form-group">
+      <label><i class="fa-solid fa-align-left"></i> Texto da Notícia</label>
+      <textarea name="texto" rows="6" required placeholder="O conteúdo da notícia..."></textarea>
+    </div>
+
+    <div class="form-group">
+      <label><i class="fa-solid fa-image"></i> Foto de Capa (Opcional)</label>
+      <input type="file" name="imagem" accept="image/*" style="padding: 10px; background: #fff; border: 1.5px dashed var(--cinza-300);">
+    </div>
+
+    <div style="display: flex; gap: 10px; margin-top: 25px;">
+      <button type="submit"><i class="fa-solid fa-paper-plane"></i> Publicar Notícia</button>
+      <a href="{{ url_for('admin_noticias') }}" class="btn" style="background: var(--cinza-100); color: var(--preto); box-shadow: none;"><i class="fa-solid fa-xmark"></i> Cancelar</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

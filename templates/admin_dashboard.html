@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}Painel - Alfaiataria{% endblock %}
+
+{% block content %}
+<h1>Painel do Administrador</h1>
+
+<!-- 1. CARTÕES DE ESTATÍSTICAS -->
+<div class="gallery" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
+  <div class="card" style="text-align: center; padding: 20px;">
+    <i class="fa-solid fa-newspaper" style="font-size: 2rem; color: var(--azul); margin-bottom: 10px;"></i>
+    <div style="font-size: 0.9rem; color: var(--cinza-500); font-weight: 600; text-transform: uppercase;">Notícias</div>
+    <big>{{ stats.noticias }}</big>
+  </div>
+
+  <div class="card" style="text-align: center; padding: 20px;">
+    <i class="fa-solid fa-eye" style="font-size: 2rem; color: var(--ciano-esc); margin-bottom: 10px;"></i>
+    <div style="font-size: 0.9rem; color: var(--cinza-500); font-weight: 600; text-transform: uppercase;">Visualizações</div>
+    <big>{{ stats.visualizacoes }}</big>
+  </div>
+
+  <div class="card" style="text-align: center; padding: 20px;">
+    <i class="fa-solid fa-box" style="font-size: 2rem; color: var(--azul-esc); margin-bottom: 10px;"></i>
+    <div style="font-size: 0.9rem; color: var(--cinza-500); font-weight: 600; text-transform: uppercase;">Pedidos</div>
+    <big>{{ stats.pedidos }}</big>
+  </div>
+
+  <div class="card" style="text-align: center; padding: 20px; border-color: #f59e0b;">
+    <i class="fa-solid fa-clock" style="font-size: 2rem; color: #f59e0b; margin-bottom: 10px;"></i>
+    <div style="font-size: 0.9rem; color: var(--cinza-500); font-weight: 600; text-transform: uppercase;">Pendentes</div>
+    <big style="color: #d97706;">{{ stats.pendentes }}</big>
+  </div>
+</div>
+
+<!-- 2. AÇÕES RÁPIDAS (Os botões que pediste para colocar aqui) -->
+<h2>Ações Rápidas</h2>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-bottom: 30px;">
+
+  <a href="{{ url_for('admin_noticias') }}" class="card" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; margin: 0; text-decoration: none; color: var(--preto);">
+    <div style="background: var(--azul-cla); width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
+      <i class="fa-solid fa-pen-to-square" style="font-size: 1.4rem; color: var(--azul-esc);"></i>
+    </div>
+    <b style="font-size: 0.95rem;">Notícias</b>
+  </a>
+
+  <a href="{{ url_for('fotos') }}" class="card" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; margin: 0; text-decoration: none; color: var(--preto);">
+    <div style="background: #e0f2fe; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
+      <i class="fa-solid fa-images" style="font-size: 1.4rem; color: #0284c7;"></i>
+    </div>
+    <b style="font-size: 0.95rem;">Fotos</b>
+  </a>
+
+  <a href="{{ url_for('admin_pedidos') }}" class="card" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; margin: 0; text-decoration: none; color: var(--preto);">
+    <div style="background: #fce7f3; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
+      <i class="fa-solid fa-cart-shopping" style="font-size: 1.4rem; color: #db2777;"></i>
+    </div>
+    <b style="font-size: 0.95rem;">Pedidos</b>
+  </a>
+
+  <a href="{{ url_for('admin_admins') }}" class="card" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; margin: 0; text-decoration: none; color: var(--preto);">
+    <div style="background: #f3e8ff; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
+      <i class="fa-solid fa-users-gear" style="font-size: 1.4rem; color: #9333ea;"></i>
+    </div>
+    <b style="font-size: 0.95rem;">Admins</b>
+  </a>
+
+  <a href="{{ url_for('admin_logs') }}" class="card" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; margin: 0; text-decoration: none; color: var(--preto);">
+    <div style="background: #dcfce7; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
+      <i class="fa-solid fa-list-check" style="font-size: 1.4rem; color: #16a34a;"></i>
+    </div>
+    <b style="font-size: 0.95rem;">Registo</b>
+  </a>
+
+  <a href="{{ url_for('admin_senha') }}" class="card" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; margin: 0; text-decoration: none; color: var(--preto);">
+    <div style="background: #fee2e2; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
+      <i class="fa-solid fa-key" style="font-size: 1.4rem; color: #dc2626;"></i>
+    </div>
+    <b style="font-size: 0.95rem;">Senha</b>
+  </a>
+
+</div>
+
+<!-- 3. ÚLTIMAS NOTÍCIAS -->
+<div style="display: flex; justify-content: space-between; align-items: center; margin-top: 30px;">
+  <h2 style="margin: 0;">Últimas Notícias</h2>
+  <a href="{{ url_for('admin_noticias') }}" style="font-size: 0.9rem; font-weight: 600;">Ver todas →</a>
+</div>
+
+{% for n in ultimas %}
+<div class="card" style="display: flex; justify-content: space-between; align-items: center; padding: 15px 20px;">
+  <div>
+    <b style="font-size: 1.05rem; display: block; margin-bottom: 4px;">{{ n.titulo }}</b>
+    <small style="color: var(--cinza-500);">
+      <i class="fa-regular fa-calendar"></i> {{ n.criada_em[:10] }}
+    </small>
+  </div>
+  <div style="display: flex; gap: 15px; font-weight: 600; color: var(--cinza-700);">
+    <span title="Visualizações"><i class="fa-solid fa-eye" style="color: var(--azul);"></i> {{ n.visualizacoes }}</span>
+    <span title="Gostos"><i class="fa-solid fa-thumbs-up" style="color: #16a34a;"></i> {{ n.likes }}</span>
+    <span title="Não gostos"><i class="fa-solid fa-thumbs-down" style="color: #dc2626;"></i> {{ n.dislikes }}</span>
+  </div>
+</div>
+{% else %}
+<div class="card">
+  <p style="text-align: center; color: var(--cinza-500);">Nenhuma notícia publicada ainda.</p>
+</div>
+{% endfor %}
+
+{% endblock %}

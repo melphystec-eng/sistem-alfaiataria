@@ -1,0 +1,12 @@
+{% extends "base.html" %}{% block title %}Fotos{% endblock %}
+{% block content %}
+<h1>Galeria de Fotos</h1>
+<div class="gallery">
+{% for n in noticias %}
+  <a href="{{ url_for('ver_noticia', id=n.id) }}">
+    <img src="{{ url_for('static', filename='uploads/' + n.imagem) }}" title="{{ n.titulo }}">
+  </a>
+{% else %}<p>Sem fotos publicadas.</p>{% endfor %}
+</div>
+{% endblock %}
+

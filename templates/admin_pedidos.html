@@ -1,0 +1,33 @@
+{% extends "base.html" %}{% block title %}Pedidos{% endblock %}
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center;">
+  <h1><i class="fa-solid fa-box" style="color: var(--azul);"></i> Pedidos</h1>
+  <a href="{{ url_for('admin_pedido_novo') }}" class="btn"><i class="fa-solid fa-plus"></i> Novo Pedido</a>
+</div>
+
+<table>
+<thead>
+  <tr><th>Código</th><th>Cliente</th><th>Preço</th><th>Estado</th><th style="text-align: right;">Ação</th></tr>
+</thead>
+<tbody>
+{% for p in pedidos %}
+<tr>
+  <td data-label="Código"><b>{{ p.codigo }}</b></td>
+  <td data-label="Cliente">{{ p.cliente }}</td>
+  <td data-label="Preço">{{ "%.2f"|format(p.preco) }} Kz</td>
+  <td data-label="Estado"><span class="estado {{ p.estado }}">{{ p.estado }}</span></td>
+  <td data-label="Ação" style="text-align: right;">
+    <form method="post" action="{{ url_for('admin_pedido_estado', id=p.id) }}" style="display:flex; gap:6px; justify-content: flex-end; align-items: center;">
+      <select name="estado" style="width: auto; padding: 6px 10px; font-size: 0.85rem; height: 36px; margin: 0;">
+        {% for e in estados %}
+        <option value="{{ e }}" {% if e==p.estado %}selected{% endif %}>{{ e }}</option>
+        {% endfor %}
+      </select>
+      <button class="btn-sm"><i class="fa-solid fa-check"></i></button>
+    </form>
+  </td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+{% endblock %}

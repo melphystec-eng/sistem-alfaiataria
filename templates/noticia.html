@@ -1,0 +1,15 @@
+{% extends "base.html" %}{% block title %}{{ n.titulo }}{% endblock %}
+{% block content %}
+<div class="card">
+  <h1>{{ n.titulo }}</h1>
+  <small>{{ n.criada_em }} | 👁️ {{ n.visualizacoes }}</small>
+  {% if n.imagem %}<p><img src="{{ url_for('static', filename='uploads/' + n.imagem) }}"
+     style="max-width:100%;border-radius:6px"></p>{% endif %}
+  <p style="white-space:pre-line">{{ n.texto }}</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
+      <a href="{{ url_for('reagir', id=n.id, acao='like') }}"><button>👍 Gosto ({{ n.likes }})</button></a>
+      <a href="{{ url_for('reagir', id=n.id, acao='dislike') }}"><button class="btn-danger">👎 Não gosto ({{ n.dislikes }})</button></a>
+    </div>
+
+</div>
+{% endblock %}
