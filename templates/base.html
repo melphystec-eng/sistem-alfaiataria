@@ -416,18 +416,100 @@ h1::after {
   display: flex; justify-content: center; align-items: center; gap: 10px;
 }
 
+/* ================= BOTÕES FLUTUANTES ================= */
+.fab-container {
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 1000;
+}
+.fab-btn {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #fff !important;
+  font-size: 1.8rem;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+.fab-btn:hover {
+  transform: translateY(-5px) scale(1.05);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+}
+.fab-whatsapp { background: #25D366; }
+.fab-whatsapp:hover { background: #20ba5a; }
+.fab-call { background: var(--azul); }
+.fab-call:hover { background: var(--azul-esc); }
+
+/* Ajuste para telemóvel (para não tapar conteúdo) */
+@media (max-width: 768px) {
+  .fab-container {
+    bottom: calc(20px + env(safe-area-inset-bottom));
+    right: 15px;
+  }
+  .fab-btn {
+    width: 50px;
+    height: 50px;
+    font-size: 1.4rem;
+  }
+}
+/* ================= TRATAMENTO DE IMAGENS ================= */
+/* Para imagens de notícias (que devem ocupar a largura toda mas sem esticar) */
+.img-noticia {
+  width: 100%;
+  height: auto;
+  max-height: 450px; /* Evita que a imagem ocupe o ecrã todo se for muito alta */
+  object-fit: contain;
+  background-color: #f1f5f9; /* Fundo cinza para as bordas laterais */
+  border-radius: 8px;
+  margin-bottom: 15px;
+  display: block;
+}
+
+/* Para a galeria (tamanho de miniatura uniforme) */
+.gallery-item {
+  width: 100%;
+  height: 250px; /* Altura fixa para alinhar a grelha */
+  background-color: #f1f5f9;
+  border-radius: 8px 8px 0 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.gallery-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* A imagem inteira é visível */
+  padding: 5px; /* Dá um pequeno respiro */
+  margin: 0;
+}
+
+
 </style>
 </head>
 <body>
 
 <header class="navbar">
   <div class="nav-inner">
+    <a href="{{ url_for('static', filename='downloads/alfaiataria.apk') }}" download class="btn" style="background: #10b981; color: white; padding: 8px 16px; font-size: 0.85rem; margin-left: auto; margin-right: 15px;">
+        <i class="fa-brands fa-android"></i> Baixar App </a>
+    <a href="{{ url_for('static', filename='downloads/Alfaiataria.exe') }}" download class="btn" style="background: #3b82f6; color: white; padding: 8px 16px; font-size: 0.85rem;">
+          <i class="fa-solid fa-desktop"></i> Baixar App
+        </a>
     <a href="{{ url_for('home') }}" class="brand">Sistema de Consulta</a>
-    <a href="{{ url_for('home') }}" class="brand">Alfaiataria-Mario Calandula</a>
     <button class="hamburger" id="hamburger" aria-label="Menu" aria-expanded="false">
       <span></span><span></span><span></span>
     </button>
     <nav class="nav-links" id="navLinks">
+
       <a href="{{ url_for('home') }}">Início</a>
       <a href="{{ url_for('fotos') }}">Fotos</a>
       <a href="{{ url_for('consultar') }}">Consultar Pedido</a>
@@ -448,6 +530,18 @@ h1::after {
 {% endwith %}
 
 {% block content %}{% endblock %}
+    <div class="fab-container">
+      <!-- WhatsApp -->
+      <a href="https://wa.me/qr/TG4TC2KX6A6OE1" target="_blank" class="fab-btn fab-whatsapp" title="Falar no WhatsApp" aria-label="WhatsApp">
+        <i class="fa-brands fa-whatsapp"></i>
+      </a>
+
+      <!-- Chamada Telefónica -->
+      <a href="tel:+244928941415" class="fab-btn fab-call" title="Ligar agora" aria-label="Ligar">
+        <i class="fa-solid fa-phone"></i>
+      </a>
+    </div>
+
 
 <script>
 (function(){

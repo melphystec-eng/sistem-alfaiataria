@@ -6,7 +6,7 @@
 <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
   <div>
     <h1 style="margin-bottom: 0; padding-bottom: 0;">Notícias & Novidades</h1>
-    <p style="color: var(--cinza-500); margin-top: 5px;">A Solução da Sua Roupa E</p>
+    <p style="color: var(--cinza-500); margin-top: 5px;">A SOLUÇÃO DA SUA ROUPA É 👉 MARIO CALANDULA 👌</p>
   </div>
 
   <!-- Miniatura do logo -->
@@ -16,7 +16,7 @@
       <circle cx="250" cy="250" r="175" fill="#00E5FF"/>
       <path id="top-curve" d="M 80 250 A 170 170 0 0 1 420 250" fill="transparent"/>
       <text font-family="'Times New Roman', serif" font-size="32" font-weight="bold" fill="#000" letter-spacing="1">
-        <textPath href="#top-curve" startOffset="50%" text-anchor="middle">A Solução da Sua Roupa E</textPath>
+        <textPath href="#top-curve" startOffset="50%" text-anchor="middle">A SOLUÇÃO DA SUA ROUPA É 👉 MARIO CALANDULA 👌</textPath>
       </text>
       <path id="bottom-curve" d="M 420 250 A 170 170 0 0 1 80 250" fill="transparent"/>
       <text font-family="'Times New Roman', serif" font-size="34" font-weight="bold" fill="#000">
@@ -45,8 +45,9 @@
 {% for n in noticias %}
 <div class="card">
   {% if n.imagem %}
-    <img src="{{ url_for('static', filename='uploads/' + n.imagem) }}" style="max-width:100%; border-radius:8px; margin-bottom:15px;">
+    <img src="{{ url_for('static', filename='uploads/' + n.imagem) }}" class="img-noticia">
   {% endif %}
+
 
   <h2><a href="{{ url_for('ver_noticia', id=n.id) }}">{{ n.titulo }}</a></h2>
   <p>{{ n.texto[:200] }}{% if n.texto|length > 200 %}...{% endif %}</p>

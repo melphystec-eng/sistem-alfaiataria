@@ -54,6 +54,12 @@ def init_db():
             likes    INTEGER DEFAULT 0,
             dislikes INTEGER DEFAULT 0
         );
+        CREATE TABLE IF NOT EXISTS fotos(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            titulo TEXT,
+            imagem TEXT NOT NULL,
+            criado_em TEXT NOT NULL
+        );
         CREATE TABLE IF NOT EXISTS pedidos(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             codigo TEXT UNIQUE NOT NULL,
@@ -161,11 +167,9 @@ def reagir(id, acao):
 @app.route("/fotos")
 def fotos():
     db = get_db()
-    noticias = db.execute(
-        "SELECT * FROM noticias WHERE imagem IS NOT NULL AND imagem <> '' "
-        "ORDER BY criada_em DESC").fetchall()
-    return render_template("fotos.html", noticias=noticias)
-
+    # Agora procura na tabela 'fotos' em vez de 'noticias'
+    todas_fotos = db.execute("SELECT * FROM fotos ORDER BY criado_em DESC").fetchall()
+    return render_template("fotos.html", fotos=todas_fotos)
 
 @app.route("/consultar", methods=["GET", "POST"])
 def consultar():
@@ -276,6 +280,57 @@ def admin_noticia_apagar(id):
     flash("Notícia apagada.")
     return redirect(url_for("admin_noticias"))
 
+
+# -------- Galeria de Fotos (Admin) --------
+@app.route("/admin/galeria")
+@login_required
+def admin_galeria():
+    db = get_db()
+    fotos = db.execute("SELECT * FROM fotos ORDER BY criado_em DESC").fetchall()
+    return render_template("admin_galeria.html", fotos=fotos)
+
+
+@app.route("/admin/galeria/nova", methods=["GET", "POST"])
+@login_required
+def admin_galeria_nova():
+    if request.method == "POST":
+        titulo = request.form.get("titulo", "").strip()
+        f = request.files.get("imagem")
+
+        if not f or not f.filename:
+            flash("Escolhe uma imagem válida.")
+            return redirect(url_for("admin_galeria_nova"))
+
+        nome = f"{secrets.token_hex(4)}_{secure_filename(f.filename)}"
+        f.save(os.path.join(UPLOAD_DIR, nome))
+
+        db = get_db()
+        db.execute("INSERT INTO fotos(titulo, imagem, criado_em) VALUES (?,?,?)",
+                   (titulo, nome, datetime.now().isoformat(timespec="seconds")))
+        db.commit()
+        registar_log("foto_galeria_criada", f"titulo={titulo}")
+        flash("Foto adicionada à galeria.")
+        return redirect(url_for("admin_galeria"))
+
+    return render_template("admin_foto_form.html")
+
+
+@app.route("/admin/galeria/apagar/<int:id>", methods=["POST"])
+@login_required
+def admin_galeria_apagar(id):
+    db = get_db()
+    f = db.execute("SELECT * FROM fotos WHERE id=?", (id,)).fetchone()
+    if f:
+        try:
+            os.remove(os.path.join(UPLOAD_DIR, f["imagem"]))
+        except OSError:
+            pass
+
+        db.execute("DELETE FROM fotos WHERE id=?", (id,))
+        db.commit()
+        registar_log("foto_galeria_apagada", f"id={id} titulo={f['titulo']}")
+        flash("Foto apagada da galeria.")
+    return redirect(url_for("admin_galeria"))
 
 # -------- Pedidos --------
 @app.route("/admin/pedidos")

@@ -1,12 +1,36 @@
-{% extends "base.html" %}{% block title %}Fotos{% endblock %}
+{% extends "base.html" %}{% block title %}Galeria de Fotos{% endblock %}
 {% block content %}
-<h1>Galeria de Fotos</h1>
-<div class="gallery">
-{% for n in noticias %}
-  <a href="{{ url_for('ver_noticia', id=n.id) }}">
-    <img src="{{ url_for('static', filename='uploads/' + n.imagem) }}" title="{{ n.titulo }}">
-  </a>
-{% else %}<p>Sem fotos publicadas.</p>{% endfor %}
-</div>
-{% endblock %}
 
+<div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 20px;">
+  <h1 style="margin-bottom: 0; padding-bottom: 0;"><i class="fa-solid fa-images" style="color: var(--azul);"></i> Galeria de Fotos</h1>
+
+  {% if session.get('admin_id') %}
+    <a href="{{ url_for('admin_galeria_nova') }}" class="btn">
+      <i class="fa-solid fa-plus"></i> Adicionar Foto
+    </a>
+  {% endif %}
+</div>
+
+<div class="gallery">
+{% for f in fotos %}
+  <div class="card" style="padding: 0; overflow: hidden; margin: 0;">
+    <!-- Contentor da imagem -->
+    <div class="gallery-item">
+      <img src="{{ url_for('static', filename='uploads/' + f.imagem) }}">
+    </div>
+
+    {% if f.titulo %}
+    <div style="padding: 12px; text-align: center; background: #fff; border-top: 1px solid var(--cinza-100);">
+      <b style="color: var(--preto); font-size: 0.9rem;">{{ f.titulo }}</b>
+    </div>
+    {% endif %}
+  </div>
+{% else %}
+  <div class="card" style="grid-column: 1 / -1; text-align: center; padding: 40px;">
+    <i class="fa-regular fa-image" style="font-size: 3rem; color: var(--cinza-300); margin-bottom: 10px;"></i>
+    <p style="color: var(--cinza-500); margin: 0;">Sem fotos publicadas na galeria.</p>
+  </div>
+{% endfor %}
+</div>
+
+{% endblock %}
