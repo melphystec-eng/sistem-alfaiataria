@@ -1,0 +1,31 @@
+{% extends "base.html" %}{% block title %}Gerir Galeria{% endblock %}
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center;">
+  <h1><i class="fa-solid fa-images" style="color: var(--azul);"></i> Gerir Galeria</h1>
+  <a href="{{ url_for('admin_galeria_nova') }}" class="btn"><i class="fa-solid fa-plus"></i> Adicionar Foto</a>
+</div>
+
+<table style="margin-top: 20px;">
+<thead>
+  <tr><th style="width: 100px;">Miniatura</th><th>Legenda</th><th>Data</th><th style="text-align: right;">Ações</th></tr>
+</thead>
+<tbody>
+{% for f in fotos %}
+<tr>
+  <td data-label="Miniatura">
+    <img src="{{ url_for('static', filename='uploads/' + f.imagem) }}" style="width: 80px; height: 60px; object-fit: cover; border-radius: 6px;">
+  </td>
+  <td data-label="Legenda"><b>{{ f.titulo or 'Sem legenda' }}</b></td>
+  <td data-label="Data">{{ f.criado_em[:10] }}</td>
+  <td data-label="Ações" style="text-align: right;">
+    <form method="post" action="{{ url_for('admin_galeria_apagar', id=f.id) }}" onsubmit="return confirm('Apagar esta foto?')" style="display:inline">
+      <button class="btn-danger btn-sm"><i class="fa-solid fa-trash"></i> Apagar</button>
+    </form>
+  </td>
+</tr>
+{% else %}
+<tr><td colspan="4" style="text-align: center; padding: 30px; color: var(--cinza-500);">Nenhuma foto na galeria.</td></tr>
+{% endfor %}
+</tbody>
+</table>
+{% endblock %}
