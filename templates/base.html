@@ -499,11 +499,13 @@ h1::after {
 
 <header class="navbar">
   <div class="nav-inner">
-    <a href="{{ url_for('static', filename='downloads/alfaiataria.apk') }}" download class="btn" style="background: #10b981; color: white; padding: 8px 16px; font-size: 0.85rem; margin-left: auto; margin-right: 15px;">
-        <i class="fa-brands fa-android"></i> Baixar App </a>
-    <a href="{{ url_for('static', filename='downloads/Alfaiataria.exe') }}" download class="btn" style="background: #3b82f6; color: white; padding: 8px 16px; font-size: 0.85rem;">
-          <i class="fa-solid fa-desktop"></i> Baixar App
-        </a>
+    <div style="display: flex; gap: 6px;">
+      <a href="{{ url_for('static', filename='downloads/alfaiataria.apk') }}" download class="btn" style="background: #10b981; color: white; padding: 4px 10px; font-size: 0.7rem; height: auto; min-height: 28px; box-shadow: none; border-radius: 6px;">
+        <i class="fa-brands fa-android"></i> Android
+      </a>
+      <a href="#" class="btn" style="background: #3b82f6; color: white; padding: 4px 10px; font-size: 0.7rem; height: auto; min-height: 28px; box-shadow: none; border-radius: 6px;">
+        <i class="fa-solid fa-desktop"></i> PC
+      </a>
     <a href="{{ url_for('home') }}" class="brand">Sistema de Consulta</a>
     <button class="hamburger" id="hamburger" aria-label="Menu" aria-expanded="false">
       <span></span><span></span><span></span>
