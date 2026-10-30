@@ -1,0 +1,27 @@
+{% extends "base.html" %}{% block title %}Alterar Senha{% endblock %}
+{% block content %}
+<div class="card" style="max-width: 500px; margin: 0 auto;">
+  <h1><i class="fa-solid fa-key" style="color: #f59e0b;"></i> Alterar Senha de Admin</h1>
+  <p style="color: var(--cinza-500); margin-bottom: 20px;">
+    A definir nova senha para: <b>{{ alvo.username }}</b>
+  </p>
+
+  <form method="post">
+
+    <div class="form-group">
+      <label><i class="fa-solid fa-lock-open"></i> Nova Senha</label>
+      <input type="password" name="nova" required placeholder="Mínimo 6 caracteres">
+    </div>
+
+    <div class="form-group">
+      <label><i class="fa-solid fa-check-double"></i> Confirmar Nova Senha</label>
+      <input type="password" name="confirmar" required placeholder="Repita a nova senha">
+    </div>
+
+    <div style="display: flex; gap: 10px; margin-top: 25px;">
+      <button type="submit" style="background: #f59e0b; box-shadow: 0 4px 12px rgba(245,158,11,.3);"><i class="fa-solid fa-floppy-disk"></i> Guardar Nova Senha</button>
+      <a href="{{ url_for('admin_admins') }}" class="btn" style="background: var(--cinza-100); color: var(--preto); box-shadow: none;"><i class="fa-solid fa-xmark"></i> Cancelar</a>
+    </div>
+  </form>
+</div>
+{% endblock %}
