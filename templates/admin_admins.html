@@ -12,21 +12,24 @@
 <tbody>
 {% for a in admins %}
 <tr>
-  <td data-label="Utilizador"><b>{{ a.username }}</b></td>
-  <td data-label="Estado">
-    {% if a.ativo %}<span class="estado entregue"><i class="fa-solid fa-check"></i> Ativo</span>
-    {% else %}<span class="estado cancelado"><i class="fa-solid fa-ban"></i> Bloqueado</span>{% endif %}
-  </td>
-  <td data-label="Tipo">{% if a.is_super %}<i class="fa-solid fa-star" style="color: #f59e0b;"></i> Super{% else %}Admin{% endif %}</td>
-  <td data-label="Criado por">{{ a.criado_por_nome or 'Sistema' }}</td>
-  <td data-label="Ações" style="text-align: right;">
-    {% set posso = (a.id != session.admin_id) and (not a.is_super) and (session.get('is_super') or a.criado_por == session.admin_id) %}
+    <td data-label="Ações" style="text-align: right;">
+    {% set posso = (a.id != session.admin_id) and (session.get('is_super') or a.criado_por == session.admin_id) %}
     {% if posso %}
-    <form method="post" action="{{ url_for('admin_bloquear', id=a.id) }}" onsubmit="return confirm('Confirmar?')" style="display:inline">
-      <button class="{% if a.ativo %}btn-danger{% else %}btn{% endif %} btn-sm">
-        {% if a.ativo %}<i class="fa-solid fa-lock"></i> Bloquear{% else %}<i class="fa-solid fa-lock-open"></i> Desbloquear{% endif %}
-      </button>
-    </form>
+
+    <div style="display: flex; gap: 8px; justify-content: flex-end; align-items: center;">
+
+      <!-- Botão de Mudar Senha -->
+      <a href="{{ url_for('admin_alterar_senha_outro', id=a.id) }}" class="btn btn-sm" style="background: #f59e0b; box-shadow: none;" title="Alterar Senha">
+        <i class="fa-solid fa-key"></i>
+      </a>
+      <!-- Botão de Bloquear/Desbloquear -->
+      <form method="post" action="{{ url_for('admin_bloquear', id=a.id) }}" onsubmit="return confirm('Confirmar?')" style="display:inline; margin: 0;">
+        <button class="{% if a.ativo %}btn-danger{% else %}btn{% endif %} btn-sm">
+          {% if a.ativo %}<i class="fa-solid fa-lock"></i>{% else %}<i class="fa-solid fa-lock-open"></i>{% endif %}
+        </button>
+      </form>
+    </div>
+
     {% else %}<span style="color: var(--cinza-300);">—</span>{% endif %}
   </td>
 </tr>

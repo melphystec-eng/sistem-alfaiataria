@@ -477,6 +477,40 @@ def admin_bloquear(id):
     flash(f"Admin '{alvo['username']}' {'desbloqueado' if novo==1 else 'bloqueado'}.")
     return redirect(url_for("admin_admins"))
 
+@app.route("/admin/admins/<int:id>/senha", methods=["GET", "POST"])
+@login_required
+def admin_alterar_senha_outro(id):
+    db = get_db()
+    alvo = db.execute("SELECT * FROM admin WHERE id=?", (id,)).fetchone()
+    if not alvo: abort(404)
+
+    # Verificações de segurança
+    if alvo["id"] == session["admin_id"]:
+        flash("Para mudar a sua própria senha, use o menu 'Senha'.")
+        return redirect(url_for("admin_admins"))
+
+    eu = db.execute("SELECT * FROM admin WHERE id=?", (session["admin_id"],)).fetchone()
+    if not eu["is_super"] and alvo["criado_por"] != eu["id"]:
+        flash("Não tem permissão para alterar a senha deste administrador.")
+        return redirect(url_for("admin_admins"))
+
+    if request.method == "POST":
+        nova = request.form["nova"]
+        conf = request.form["confirmar"]
+
+        if len(nova) < 6:
+            flash("A senha deve ter pelo menos 6 caracteres.")
+        elif nova != conf:
+            flash("As senhas não coincidem.")
+        else:
+            db.execute("UPDATE admin SET password_hash=? WHERE id=?",
+                       (generate_password_hash(nova), alvo["id"]))
+            db.commit()
+            registar_log("senha_admin_alterada", f"alvo={alvo['username']}")
+            flash(f"Senha do administrador '{alvo['username']}' alterada com sucesso.")
+            return redirect(url_for("admin_admins"))
+
+    return render_template("admin_alterar_senha_outro.html", alvo=alvo)
 
 # -------- Registos / Logs --------
 @app.route("/admin/logs")
