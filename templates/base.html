@@ -492,6 +492,44 @@ h1::after {
   margin: 0;
 }
 
+  /* ================= ANIMAÇÃO DE LOADING NOS BOTÕES ================= */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(660deg); }
+}
+
+.btn-loading {
+  pointer-events: none; /* Impede cliques duplos */
+  opacity: 0.85;
+  position: relative;
+}
+
+.btn-loading i {
+  /* Esconde o ícone original do botão */
+  opacity: 0;
+}
+
+.btn-loading::after {
+  content: "";
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  top: 50%;
+  left: 50%;
+  margin-top: -9px;
+  margin-left: -9px;
+  border: 2.5px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+/* Para botões com fundo branco (ex: botões de cancelar) */
+.btn-loading-dark::after {
+  border: 2.5px solid rgba(0, 0, 0, 0.2);
+  border-top-color: var(--preto);
+}
+
 
 </style>
 </head>
@@ -565,6 +603,38 @@ h1::after {
   menu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => toggle(false)));
   window.addEventListener('resize', () => { if(window.innerWidth > 768) toggle(false); });
 })();
+
+    // Animação de Loading automática para todos os botões
+  document.addEventListener('DOMContentLoaded', function() {
+    // Seleciona todos os botões, inputs do tipo submit, e links que tenham a classe .btn
+    const botoes = document.querySelectorAll('button, input[type="submit"], a.btn');
+
+    botoes.forEach(botao => {
+      botao.addEventListener('click', function(e) {
+        // Se o botão estiver dentro de um formulário e for para cancelar ou apagar, não faz loading se o utilizador cancelar o confirm()
+        if (this.type === 'submit' || !this.form) {
+
+          // Adiciona a classe de loading
+          this.classList.add('btn-loading');
+
+          // Se for um botão de cor clara (cancelar), adiciona a classe escura do spinner
+          if (this.style.backgroundColor === 'var(--cinza-100)' || this.classList.contains('btn-cancel')) {
+            this.classList.add('btn-loading-dark');
+          }
+
+          // Se o botão estiver num formulário, o formulário vai submeter e a página vai mudar.
+          // Se for um link (como "Ler mais" ou "Consultar"), a página também vai mudar.
+          // Para evitar que fique preso se houver um erro de validação no formulário,
+          // removemos o loading após 3 segundos (caso a página não mude).
+          setTimeout(() => {
+            this.classList.remove('btn-loading');
+            this.classList.remove('btn-loading-dark');
+          }, 3000);
+        }
+      });
+    });
+  });
+
 </script>
 </body>
 </html>
