@@ -530,61 +530,6 @@ h1::after {
   border-top-color: var(--preto);
 }
 
-/* ================= CORREÇÕES DE RESPONSIVIDADE (MOBILE) ================= */
-/* Garante que as imagens nunca ultrapassam o ecrã */
-img {
-  max-width: 100%;
-  height: auto;
-}
-
-/* Impede que palavras ou links muito longos (como emails) quebrem o layout */
-p, td, a, h1, h2, h3 {
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-}
-
-/* Ajustes finos para telemóveis (ecrãs até 600px) */
-@media (max-width: 600px) {
-  /* Diminui o espaçamento geral para ganhar espaço */
-  body {
-    padding-left: 10px;
-    padding-right: 10px;
-  }
-
-  /* Os botões ficam um por cima do outro em ecrãs pequenos */
-  .auth-btn, .btn {
-    width: 100%;
-    margin-bottom: 8px;
-  }
-
-  /* Títulos mais pequenos para não ocuparem 3 linhas */
-  h1 { font-size: 1.4rem; }
-  h2 { font-size: 1.1rem; }
-
-  /* Caixas de estatísticas do painel admin ficam em 2 colunas */
-  .gallery { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-
-  /* Ajusta as tabelas viradas em cartões */
-  table td {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
-  }
-  table td::before { margin-bottom: 2px; }
-
-  /* Esconde a barra de navegação do topo e usa o Hamburger */
-  .nav-inner { padding: 0 10px; }
-  .nav-links { width: 100%; } /* O menu ocupa a largura toda */
-}
-
-/* No ecrã de PC, a barra de botões de download fica lado a lado */
-@media (min-width: 601px) {
-  .download-buttons {
-    display: flex;
-    gap: 10px;
-  }
-}
-
 </style>
 </head>
 <body>
