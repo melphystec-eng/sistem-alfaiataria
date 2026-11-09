@@ -16,7 +16,7 @@
     <img src="{{ f.imagem }}" style="max-width: 100%; max-height: 100%; object-fit: contain;">
   </td>
   <td data-label="Legenda"><b>{{ f.titulo or 'Sem legenda' }}</b></td>
-  <td data-label="Data">{{ f.criado_em[:10] }}</td>
+ <td data-label="Data">{{ f.criado_em.strftime('%d/%m/%Y %H:M') }}</td>
   <td data-label="Ações" style="text-align: right;">
     <form method="post" action="{{ url_for('admin_galeria_apagar', id=f.id) }}" onsubmit="return confirm('Apagar esta foto?')" style="display:inline">
       <button class="btn-danger btn-sm"><i class="fa-solid fa-trash"></i> Apagar</button>

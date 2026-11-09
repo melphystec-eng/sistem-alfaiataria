@@ -13,7 +13,7 @@
 {% for n in noticias %}
 <tr>
   <td data-label="Título"><a href="{{ url_for('ver_noticia', id=n.id) }}">{{ n.titulo }}</a></td>
-  <td data-label="Data">{{ n.criada_em[:10] }}</td>
+ <td data-label="Data">{{ n.criada_em.strftime('%d/%m/%Y %H:M') }}</td>
   <td data-label="👁️">{{ n.visualizacoes }}</td>
   <td data-label="👍">{{ n.likes }}</td>
   <td data-label="👎">{{ n.dislikes }}</td>

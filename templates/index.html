@@ -74,7 +74,7 @@
       <i class="fa-solid fa-eye"></i> {{ n.visualizacoes }} |
       <i class="fa-solid fa-thumbs-up"></i> {{ n.likes }} |
       <i class="fa-solid fa-thumbs-down"></i> {{ n.dislikes }} |
-      {{ n.criada_em[:10] }}
+      {{ n.criada_em.strftime('%d/%m/%Y %H:M') }}
     </small>
     <a href="{{ url_for('ver_noticia', id=n.id) }}">
       <button style="padding: 6px 14px; font-size: 0.85rem;">Ler mais <i class="fa-solid fa-arrow-right"></i></button>

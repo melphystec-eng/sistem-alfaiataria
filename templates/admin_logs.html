@@ -20,7 +20,7 @@
 <tbody>
 {% for l in logs %}
 <tr>
-  <td data-label="Data"><small>{{ l.data.replace('T', ' ') }}</small></td>
+  <td data-label="Data"><small>{{ l.data.strftime('%d/%m/%Y %H:M', ' ') }}</small></td>
   <td data-label="Admin"><b>{{ l.admin_user or 'Visitante' }}</b></td>
   <td data-label="Ação"><code>{{ l.acao }}</code></td>
   <td data-label="Detalhe">{{ l.detalhe or '-' }}</td>

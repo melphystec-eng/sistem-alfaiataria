@@ -91,7 +91,7 @@
   <div>
     <b style="font-size: 1.05rem; display: block; margin-bottom: 4px;">{{ n.titulo }}</b>
     <small style="color: var(--cinza-500);">
-      <i class="fa-regular fa-calendar"></i> {{ n.criada_em[:10] }}
+      <i class="fa-regular fa-calendar"></i> {{ n.criada_em.strftime('%d/%m/%Y %H:M') }}
     </small>
   </div>
   <div style="display: flex; gap: 15px; font-weight: 600; color: var(--cinza-700);">

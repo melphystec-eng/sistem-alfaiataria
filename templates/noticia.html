@@ -2,7 +2,7 @@
 {% block content %}
 <div class="card">
   <h1>{{ n.titulo }}</h1>
-  <small>{{ n.criada_em }} | <i class="fa-solid fa-eye"></i> {{ n.visualizacoes }}</small>
+  <small>{{ n.criada_em.strftime('%d/%m/%Y %H:M') }} | <i class="fa-solid fa-eye"></i> {{ n.visualizacoes }}</small>
 
   {% if n.imagem %}
     <p style="margin-top: 15px;">
