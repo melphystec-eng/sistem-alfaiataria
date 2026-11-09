@@ -6,7 +6,7 @@
 
   {% if n.imagem %}
     <p style="margin-top: 15px;">
-      <img src="{{ url_for('static', filename='uploads/' + n.imagem) }}" class="img-noticia" style="max-height: 600px;">
+      <img src="{{ n.imagem }}" class="img-noticia" style="max-height: 600px;">
     </p>
   {% endif %}
 

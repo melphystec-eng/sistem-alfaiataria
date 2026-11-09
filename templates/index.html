@@ -63,7 +63,7 @@
 {% for n in noticias %}
 <div class="card">
   {% if n.imagem %}
-    <img src="{{ url_for('static', filename='uploads/' + n.imagem) }}" class="img-noticia">
+    <img src="{{ n.imagem }}" class="img-noticia">
   {% endif %}
 
   <h2><a href="{{ url_for('ver_noticia', id=n.id) }}">{{ n.titulo }}</a></h2>

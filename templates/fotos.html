@@ -16,7 +16,7 @@
   <div class="card" style="padding: 0; overflow: hidden; margin: 0;">
     <!-- Contentor da imagem -->
     <div class="gallery-item">
-      <img src="{{ url_for('static', filename='uploads/' + f.imagem) }}">
+      <img src="{{ f.imagem }}">
     </div>
 
     {% if f.titulo %}
