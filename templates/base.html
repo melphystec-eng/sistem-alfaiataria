@@ -544,7 +544,8 @@ h1::after {
         <i class="fa-solid fa-desktop"></i>
       </a>
       <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <a href="{{ url_for('home') }}" class="brand">Mario_Calandula</a>
+      <a href="{{ url_for('home') }}" class="brand">Mario_Calandula</a>
+      <a href="{{ url_for('contacto') }}">Contacto 💬</a>
     <button class="hamburger" id="hamburger" aria-label="Menu" aria-expanded="false">
       <span></span><span></span><span></span>
     </button>
@@ -554,6 +555,7 @@ h1::after {
       <a href="{{ url_for('fotos') }}">Fotos</a>
       <a href="{{ url_for('consultar') }}">Consultar Pedido</a>
       {% if session.get('admin_id') %}
+        <a href="{{ url_for('admin_chat') }}">Chat</a>
         <a href="{{ url_for('admin_dashboard') }}">Painel Administrativo</a>
         <a href="{{ url_for('logout') }}" class="logout">Sair ⏻</a>
       {% else %}
@@ -580,6 +582,7 @@ h1::after {
       <a href="tel:+244928941415" class="fab-btn fab-call" title="Ligar agora" aria-label="Ligar">
         <i class="fa-solid fa-phone"></i>
       </a>
+
     </div>
 
 

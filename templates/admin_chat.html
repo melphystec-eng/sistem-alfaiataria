@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% block title %}Chat - Administração{% endblock %}
+
+{% block content %}
+<div style="display: flex; gap: 20px; height: 80vh;">
+  
+  <!-- Barra Lateral de Conversas -->
+  <div class="card" style="width: 300px; padding: 0; display: flex; flex-direction: column; overflow: hidden; margin: 0;">
+    <div style="padding: 15px; background: var(--azul-esc); color: white;">
+      <h3 style="margin: 0;"><i class="fa-solid fa-comments"></i> Conversas</h3>
+    </div>
+    
+    <div style="overflow-y: auto; flex: 1;">
+      <!-- Sala Geral dos Admins -->
+      <div onclick="mudarSala('geral_admins')" class="sala-item" data-sala="geral_admins" style="padding: 15px; border-bottom: 1px solid var(--cinza-100); cursor: pointer; display: flex; align-items: center; gap: 10px; background: #e0f2fe;">
+        <i class="fa-solid fa-users-gear" style="color: var(--azul); font-size: 1.2rem;"></i>
+        <div>
+          <b style="display: block; color: var(--preto);">Admins (Geral)</b>
+          <small style="color: var(--cinza-500);">Conversa interna</small>
+        </div>
+      </div>
+
+      <!-- Salas dos Clientes -->
+      {% for s in salas_clientes %}
+      <div onclick="mudarSala('{{ s }}')" class="sala-item" data-sala="{{ s }}" style="padding: 15px; border-bottom: 1px solid var(--cinza-100); cursor: pointer; display: flex; align-items: center; gap: 10px;">
+        <i class="fa-solid fa-user" style="color: var(--cinza-500); font-size: 1.2rem;"></i>
+        <div>
+          <b style="display: block; color: var(--preto);">Cliente</b>
+          <small style="color: var(--cinza-500);">{{ s.replace('cliente_', '#') }}</small>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Área Principal do Chat -->
+  <div class="card" style="flex: 1; padding: 0; display: flex; flex-direction: column; overflow: hidden; margin: 0;">
+    <div style="padding: 15px; background: var(--cinza-100); border-bottom: 1px solid var(--cinza-300);">
+      <h3 id="titulo-sala" style="margin: 0; color: var(--preto);">Admins (Geral)</h3>
+    </div>
+    
+    <div id="admin-chat-box" style="flex: 1; padding: 20px; overflow-y: auto; background: #f8fafc; display: flex; flex-direction: column; gap: 10px;">
+      <!-- Mensagens -->
+    </div>
+
+    <div style="padding: 15px; background: white; border-top: 1px solid var(--cinza-100); display: flex; gap: 10px;">
+      <input type="text" id="admin-chat-input" placeholder="Escreva uma mensagem..." style="margin: 0; flex: 1;" onkeypress="if(event.key === 'Enter') enviarMensagemAdmin()">
+      <button onclick="enviarMensagemAdmin()"><i class="fa-solid fa-paper-plane"></i> Enviar</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+let salaAtual = 'geral_admins';
+const chatBox = document.getElementById('admin-chat-box');
+const input = document.getElementById('admin-chat-input');
+const titulo = document.getElementById('titulo-sala');
+
+// Mudar de sala
+function mudarSala(novaSala) {
+  salaAtual = novaSala;
+  document.querySelectorAll('.sala-item').forEach(el => {
+    el.style.background = el.dataset.sala === novaSala ? '#e0f2fe' : 'transparent';
+  });
+  
+  titulo.innerText = novaSala === 'geral_admins' ? 'Admins (Geral)' : `Cliente ${novaSala.replace('cliente_', '#')}`;
+  chatBox.innerHTML = '';
+  carregarMensagensAdmin();
+}
+
+function criarBalao(msg, meuTipo) {
+  const isMeu = msg.tipo === meuTipo;
+  const corFundo = isMeu ? 'var(--azul)' : 'white';
+  const corTexto = isMeu ? 'white' : 'var(--preto)';
+  const alinhamento = isMeu ? 'flex-end' : 'flex-start';
+  const radius = isMeu ? '15px 15px 0 15px' : '15px 15px 15px 0';
+  
+  return `
+    <div style="display: flex; flex-direction: column; align-items: ${alinhamento}; max-width: 80%; align-self: ${alinhamento};">
+      ${!isMeu ? `<small style="color: var(--cinza-500); margin-bottom: 2px; font-size: 0.75rem;">${msg.nome}</small>` : ''}
+      <div style="background: ${corFundo}; color: ${corTexto}; padding: 10px 15px; border-radius: ${radius}; box-shadow: 0 1px 2px rgba(0,0,0,0.1); font-size: 0.95rem;">
+        ${msg.mensagem}
+      </div>
+      <small style="color: var(--cinza-500); font-size: 0.65rem; margin-top: 4px;">${msg.hora}</small>
+    </div>
+  `;
+}
+
+async function carregarMensagensAdmin() {
+  try {
+    const response = await fetch(`/api/chat/receber/${salaAtual}`);
+    const data = await response.json();
+    
+    if (data.mensagens.length > 0) {
+      chatBox.innerHTML = data.mensagens.map(m => criarBalao(m, data.meu_tipo)).join('');
+      chatBox.scrollTop = chatBox.scrollHeight;
+    } else {
+      chatBox.innerHTML = '<div style="text-align:center; color: #94a3b8; margin-top: 20px;">Sem mensagens nesta sala.</div>';
+    }
+  } catch (e) {}
+}
+
+async function enviarMensagemAdmin() {
+  const texto = input.value.trim();
+  if (!texto) return;
+  
+  input.value = "";
+  
+  await fetch('/api/chat/enviar', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({sala: salaAtual, mensagem: texto})
+  });
+  
+  carregarMensagensAdmin();
+}
+
+// Carrega ao abrir e depois a cada 3 segundos
+carregarMensagensAdmin();
+setInterval(carregarMensagensAdmin, 3000);
+</script>
+{% endblock %}

@@ -109,6 +109,16 @@ def init_db():
             criado_em TIMESTAMP NOT NULL
         );
     """)
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS mensagens(
+            id SERIAL PRIMARY KEY,
+            sala VARCHAR(50) NOT NULL,
+            remetente_tipo VARCHAR(10) NOT NULL, -- 'cliente' ou 'admin'
+            remetente_nome VARCHAR(100) NOT NULL,
+            mensagem TEXT NOT NULL,
+            criada_em TIMESTAMP NOT NULL
+        );
+    """)
 
     # Cria o super admin padrão se a tabela estiver vazia
     cur.execute("SELECT COUNT(*) as c FROM admin")
@@ -616,6 +626,79 @@ def admin_logs():
     acoes = [r["acao"] for r in cur.fetchall()]
 
     return render_template("admin_logs.html", logs=logs, acoes=acoes, filtro=filtro)
+
+
+import random
+import string
+
+@app.route("/contacto")
+def contacto():
+    # Se o cliente ainda não tem uma "sala", criamos uma nova (ex: sala_cliente_A3F9)
+    if "cliente_sala" not in session:
+        codigo = ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
+        session["cliente_sala"] = f"cliente_{codigo}"
+        session["cliente_nome"] = "Visitante"
+    return render_template("contacto.html")
+
+
+@app.route("/admin/chat")
+@login_required
+def admin_chat():
+    db = get_db()
+    cur = db.cursor()
+    # Pega todas as salas de clientes que têm mensagens
+    cur.execute("SELECT DISTINCT sala FROM mensagens WHERE sala LIKE 'cliente_%' ORDER BY sala DESC")
+    salas_clientes = [r["sala"] for r in cur.fetchall()]
+    return render_template("admin_chat.html", salas_clientes=salas_clientes)
+
+
+@app.route("/api/chat/enviar", methods=["POST"])
+def api_chat_enviar():
+    data = request.json
+    sala = data.get("sala")
+    mensagem = data.get("mensagem", "").strip()
+    if not mensagem or not sala:
+        return {"status": "erro"}, 400
+
+    # Define quem está a enviar
+    if session.get("admin_id"):
+        tipo = "admin"
+        nome = session.get("admin_user")
+    else:
+        tipo = "cliente"
+        nome = session.get("cliente_nome", "Visitante")
+
+    db = get_db()
+    cur = db.cursor()
+    cur.execute(
+        "INSERT INTO mensagens(sala, remetente_tipo, remetente_nome, mensagem, criada_em) VALUES (%s, %s, %s, %s, %s)",
+        (sala, tipo, nome, mensagem, datetime.now())
+    )
+    db.commit()
+    return {"status": "ok"}
+
+
+@app.route("/api/chat/receber/<sala>")
+def api_chat_receber(sala):
+    # Segurança: O cliente só pode ler a sua própria sala
+    if sala.startswith("cliente_") and not session.get("admin_id"):
+        if session.get("cliente_sala") != sala:
+            return {"status": "erro", "msg": "Acesso negado"}, 403
+
+    db = get_db()
+    cur = db.cursor()
+    cur.execute("SELECT * FROM mensagens WHERE sala=%s ORDER BY criada_em ASC", (sala,))
+    msgs = cur.fetchall()
+
+    resultado = []
+    for m in msgs:
+        resultado.append({
+            "tipo": m["remetente_tipo"],
+            "nome": m["remetente_nome"],
+            "mensagem": m["mensagem"],
+            "hora": m["criada_em"].strftime("%H:%M")
+        })
+    return {"mensagens": resultado, "meu_tipo": "admin" if session.get("admin_id") else "cliente"}
 
 
 # ======================= ARRANQUE =======================
