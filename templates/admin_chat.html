@@ -2,17 +2,41 @@
 {% block title %}Chat - Administração{% endblock %}
 
 {% block content %}
-<div style="display: flex; gap: 20px; height: 80vh;">
-  
+<style>
+  /* Esconde os botões flutuantes no chat */
+  .fab-container { display: none !important; }
+
+  /* Layout normal para PC */
+  .chat-container { display: flex; gap: 20px; height: 80vh; }
+  .chat-sidebar { width: 300px; display: flex; flex-direction: column; overflow: hidden; margin: 0; padding: 0; }
+  .chat-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; margin: 0; padding: 0; }
+
+  /* Layout para Telemóvel */
+  @media (max-width: 768px) {
+    .chat-container { flex-direction: column; height: calc(100vh - 120px); gap: 0; }
+    .chat-sidebar { width: 100%; height: 40%; border-radius: 10px 10px 0 0; }
+    .chat-main { height: 60%; border-radius: 0 0 10px 10px; border-top: none; }
+
+    /* Se a conversa estiver aberta no telemóvel, esconde a lista lateral */
+    body.chat-aberto .chat-sidebar { display: none; }
+    body.chat-aberto .chat-main { height: 100%; border-radius: 10px; }
+
+    /* Botão de voltar que só aparece no telemóvel */
+    #btn-voltar-mobile { display: inline-block !important; }
+  }
+</style>
+
+<div class="chat-container">
+
   <!-- Barra Lateral de Conversas -->
-  <div class="card" style="width: 300px; padding: 0; display: flex; flex-direction: column; overflow: hidden; margin: 0;">
+  <div class="card chat-sidebar">
     <div style="padding: 15px; background: var(--azul-esc); color: white;">
       <h3 style="margin: 0;"><i class="fa-solid fa-comments"></i> Conversas</h3>
     </div>
-    
+
     <div style="overflow-y: auto; flex: 1;">
-      <!-- Sala Geral dos Admins -->
-      <div onclick="mudarSala('geral_admins')" class="sala-item" data-sala="geral_admins" style="padding: 15px; border-bottom: 1px solid var(--cinza-100); cursor: pointer; display: flex; align-items: center; gap: 10px; background: #e0f2fe;">
+      <!-- Sala Geral -->
+      <div onclick="mudarSala('geral_admins')" class="sala-item" data-sala="geral_admins" style="padding: 15px; border-bottom: 1px solid var(--cinza-100); cursor: pointer; display: flex; align-items: center; gap: 10px;">
         <i class="fa-solid fa-users-gear" style="color: var(--azul); font-size: 1.2rem;"></i>
         <div>
           <b style="display: block; color: var(--preto);">Admins (Geral)</b>
@@ -20,7 +44,7 @@
         </div>
       </div>
 
-      <!-- Salas dos Clientes -->
+      <!-- Clientes -->
       {% for s in salas_clientes %}
       <div onclick="mudarSala('{{ s }}')" class="sala-item" data-sala="{{ s }}" style="padding: 15px; border-bottom: 1px solid var(--cinza-100); cursor: pointer; display: flex; align-items: center; gap: 10px;">
         <i class="fa-solid fa-user" style="color: var(--cinza-500); font-size: 1.2rem;"></i>
@@ -34,18 +58,22 @@
   </div>
 
   <!-- Área Principal do Chat -->
-  <div class="card" style="flex: 1; padding: 0; display: flex; flex-direction: column; overflow: hidden; margin: 0;">
-    <div style="padding: 15px; background: var(--cinza-100); border-bottom: 1px solid var(--cinza-300);">
-      <h3 id="titulo-sala" style="margin: 0; color: var(--preto);">Admins (Geral)</h3>
+  <div class="card chat-main">
+    <div style="padding: 15px; background: var(--cinza-100); border-bottom: 1px solid var(--cinza-300); display: flex; align-items: center; gap: 10px;">
+      <!-- Botão de Voltar (Só aparece no telemóvel) -->
+      <button id="btn-voltar-mobile" onclick="voltarLista()" style="display: none; background: transparent; border: none; padding: 0; min-height: auto; color: var(--azul); font-size: 1.2rem; box-shadow: none; margin: 0;">
+        <i class="fa-solid fa-arrow-left"></i>
+      </button>
+      <h3 id="titulo-sala" style="margin: 0; color: var(--preto); font-size: 1.1rem;">Admins (Geral)</h3>
     </div>
-    
-    <div id="admin-chat-box" style="flex: 1; padding: 20px; overflow-y: auto; background: #f8fafc; display: flex; flex-direction: column; gap: 10px;">
+
+    <div id="admin-chat-box" style="flex: 1; padding: 15px; overflow-y: auto; background: #f8fafc; display: flex; flex-direction: column; gap: 10px;">
       <!-- Mensagens -->
     </div>
 
-    <div style="padding: 15px; background: white; border-top: 1px solid var(--cinza-100); display: flex; gap: 10px;">
-      <input type="text" id="admin-chat-input" placeholder="Escreva uma mensagem..." style="margin: 0; flex: 1;" onkeypress="if(event.key === 'Enter') enviarMensagemAdmin()">
-      <button onclick="enviarMensagemAdmin()"><i class="fa-solid fa-paper-plane"></i> Enviar</button>
+    <div style="padding: 10px; background: white; border-top: 1px solid var(--cinza-100); display: flex; gap: 8px;">
+      <input type="text" id="admin-chat-input" placeholder="Escreva..." style="margin: 0; flex: 1; font-size: 14px;" onkeypress="if(event.key === 'Enter') enviarMensagemAdmin()">
+      <button onclick="enviarMensagemAdmin()" style="width: 45px; min-width: 45px; padding: 0;"><i class="fa-solid fa-paper-plane"></i></button>
     </div>
   </div>
 
@@ -57,15 +85,22 @@ const chatBox = document.getElementById('admin-chat-box');
 const input = document.getElementById('admin-chat-input');
 const titulo = document.getElementById('titulo-sala');
 
-// Mudar de sala
+function voltarLista() {
+  document.body.classList.remove('chat-aberto');
+}
+
 function mudarSala(novaSala) {
   salaAtual = novaSala;
   document.querySelectorAll('.sala-item').forEach(el => {
     el.style.background = el.dataset.sala === novaSala ? '#e0f2fe' : 'transparent';
   });
-  
+
   titulo.innerText = novaSala === 'geral_admins' ? 'Admins (Geral)' : `Cliente ${novaSala.replace('cliente_', '#')}`;
   chatBox.innerHTML = '';
+
+  // Ativa o modo "ecrã inteiro" no telemóvel
+  document.body.classList.add('chat-aberto');
+
   carregarMensagensAdmin();
 }
 
@@ -75,11 +110,11 @@ function criarBalao(msg, meuTipo) {
   const corTexto = isMeu ? 'white' : 'var(--preto)';
   const alinhamento = isMeu ? 'flex-end' : 'flex-start';
   const radius = isMeu ? '15px 15px 0 15px' : '15px 15px 15px 0';
-  
+
   return `
-    <div style="display: flex; flex-direction: column; align-items: ${alinhamento}; max-width: 80%; align-self: ${alinhamento};">
+    <div style="display: flex; flex-direction: column; align-items: ${alinhamento}; max-width: 85%; align-self: ${alinhamento};">
       ${!isMeu ? `<small style="color: var(--cinza-500); margin-bottom: 2px; font-size: 0.75rem;">${msg.nome}</small>` : ''}
-      <div style="background: ${corFundo}; color: ${corTexto}; padding: 10px 15px; border-radius: ${radius}; box-shadow: 0 1px 2px rgba(0,0,0,0.1); font-size: 0.95rem;">
+      <div style="background: ${corFundo}; color: ${corTexto}; padding: 10px 15px; border-radius: ${radius}; box-shadow: 0 1px 2px rgba(0,0,0,0.1); font-size: 0.95rem; word-break: break-word;">
         ${msg.mensagem}
       </div>
       <small style="color: var(--cinza-500); font-size: 0.65rem; margin-top: 4px;">${msg.hora}</small>
@@ -91,12 +126,11 @@ async function carregarMensagensAdmin() {
   try {
     const response = await fetch(`/api/chat/receber/${salaAtual}`);
     const data = await response.json();
-    
+
     if (data.mensagens.length > 0) {
       chatBox.innerHTML = data.mensagens.map(m => criarBalao(m, data.meu_tipo)).join('');
       chatBox.scrollTop = chatBox.scrollHeight;
 
-      // GUARDAR O ID DA ÚLTIMA MENSAGEM (Para limpar o alerta vermelho no admin)
       const ultimoId = data.mensagens[data.mensagens.length - 1].id;
       localStorage.setItem('chat_last_id_admin', ultimoId);
 
@@ -106,23 +140,21 @@ async function carregarMensagensAdmin() {
   } catch (e) {}
 }
 
-
 async function enviarMensagemAdmin() {
   const texto = input.value.trim();
   if (!texto) return;
-  
+
   input.value = "";
-  
+
   await fetch('/api/chat/enviar', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({sala: salaAtual, mensagem: texto})
   });
-  
+
   carregarMensagensAdmin();
 }
 
-// Carrega ao abrir e depois a cada 3 segundos
 carregarMensagensAdmin();
 setInterval(carregarMensagensAdmin, 3000);
 </script>
