@@ -530,6 +530,66 @@ h1::after {
   border-top-color: var(--preto);
 }
 
+/* Badge de Notificação (Chat) */
+.fab-chat { background: #8b5cf6; position: relative; }
+.fab-chat:hover { background: #7c3aed; }
+
+.chat-badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  background: #ef4444; /* Vermelho */
+  color: white;
+  font-size: 0.7rem;
+  font-weight: bold;
+  min-width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid white;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+  animation: pulse-red 2s infinite;
+  display: none; /* Escondido por defeito */
+}
+
+@keyframes pulse-red {
+  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+/* ================= BOTÃO FLUTUANTE DO CHAT E ALERTA ================= */
+.fab-chat { background: #8b5cf6; position: relative; }
+.fab-chat:hover { background: #7c3aed; }
+
+.chat-badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  background: #ef4444; /* Vermelho */
+  color: white;
+  font-size: 0.7rem;
+  font-weight: bold;
+  min-width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid white;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+  animation: pulse-red 2s infinite;
+  display: none; /* Escondido por defeito */
+  z-index: 10;
+}
+
+@keyframes pulse-red {
+  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
 </style>
 </head>
 <body>
@@ -572,19 +632,25 @@ h1::after {
 {% endwith %}
 
 {% block content %}{% endblock %}
+    <!-- BOTÕES FLUTUANTES -->
     <div class="fab-container">
+      <!-- Chat -->
+      <a href="{% if session.get('admin_id') %}{{ url_for('admin_chat') }}{% else %}{{ url_for('contacto') }}{% endif %}"
+          class="fab-btn fab-chat" title="Chat de Suporte" id="btn-chat-flutuante">
+          <i class="fa-solid fa-comments"></i>
+        <span class="chat-badge" id="chat-badge-notificacao">0</span>
+      </a>
+
       <!-- WhatsApp -->
-      <a href="https://wa.me/qr/TG4TC2KX6A6OE1" target="_blank" class="fab-btn fab-whatsapp" title="Falar no WhatsApp" aria-label="WhatsApp">
-        <i class="fa-brands fa-whatsapp"></i>
+      <a href="https://wa.me/244928941415" target="_blank" class="fab-btn fab-whatsapp" title="Falar no WhatsApp">
+          <i class="fa-brands fa-whatsapp"></i>
       </a>
 
       <!-- Chamada Telefónica -->
-      <a href="tel:+244928941415" class="fab-btn fab-call" title="Ligar agora" aria-label="Ligar">
-        <i class="fa-solid fa-phone"></i>
+      <a href="tel:+244928941415" class="fab-btn fab-call" title="Ligar agora">
+          <i class="fa-solid fa-phone"></i>
       </a>
-
     </div>
-
 
 <script>
 (function(){
@@ -637,6 +703,41 @@ h1::after {
       });
     });
   });
+
+   // ================= VERIFICADOR DE NOTIFICAÇÕES DO CHAT =================
+  const badge = document.getElementById('chat-badge-notificacao');
+
+  if (badge) {
+    // Cria uma chave única para o browser saber quem está a ver
+    const isAdmin = "{{ 'true' if session.get('admin_id') else 'false' }}" === "true";
+    const chaveLocal = isAdmin ? 'chat_last_id_admin' : 'chat_last_id_cliente_' + "{{ session.get('cliente_sala', '') }}";
+
+    async function verificarNovasMensagens() {
+      // Se já estiver na página do chat, esconde a bolinha
+      if (window.location.pathname.includes('/chat') || window.location.pathname.includes('/contacto')) {
+        badge.style.display = 'none';
+        return;
+      }
+
+      let ultimoIdVisto = localStorage.getItem(chaveLocal) || 0;
+
+      try {
+        const response = await fetch(`/api/chat/verificar_novas?ultimo_id=${ultimoIdVisto}`);
+        const data = await response.json();
+
+        if (data.novas > 0) {
+          badge.innerText = data.novas > 9 ? "9+" : data.novas;
+          badge.style.display = 'flex';
+        } else {
+          badge.style.display = 'none';
+        }
+      } catch (e) {}
+    }
+
+    // Verifica a cada 5 segundos
+    setInterval(verificarNovasMensagens, 5000);
+    verificarNovasMensagens(); // Verifica logo ao abrir
+  }
 
 </script>
 

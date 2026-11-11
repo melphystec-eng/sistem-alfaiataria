@@ -701,6 +701,53 @@ def api_chat_receber(sala):
     return {"mensagens": resultado, "meu_tipo": "admin" if session.get("admin_id") else "cliente"}
 
 
+@app.route("/api/chat/receber/<sala>")
+def api_chat_receber(sala):
+    if sala.startswith("cliente_") and not session.get("admin_id"):
+        if session.get("cliente_sala") != sala:
+            return {"status": "erro", "msg": "Acesso negado"}, 403
+
+    db = get_db()
+    cur = db.cursor()
+    cur.execute("SELECT * FROM mensagens WHERE sala=%s ORDER BY criada_em ASC", (sala,))
+    msgs = cur.fetchall()
+
+    resultado = []
+    for m in msgs:
+        resultado.append({
+            "id": m["id"],  # IMPORTANTE: Adicionámos o ID aqui
+            "tipo": m["remetente_tipo"],
+            "nome": m["remetente_nome"],
+            "mensagem": m["mensagem"],
+            "hora": m["criada_em"].strftime("%H:%M")
+        })
+    return {"mensagens": resultado, "meu_tipo": "admin" if session.get("admin_id") else "cliente"}
+
+@app.route("/api/chat/verificar_novas")
+def api_chat_verificar_novas():
+    db = get_db()
+    cur = db.cursor()
+    ultimo_id = request.args.get("ultimo_id", 0, type=int)
+    novas = 0
+
+    if session.get("admin_id"):
+        # Admin: Conta mensagens de clientes
+        cur.execute("""
+            SELECT COUNT(*) as c FROM mensagens 
+            WHERE sala LIKE 'cliente_%%' AND remetente_tipo = 'cliente' AND id > %s
+        """, (ultimo_id,))
+        novas = cur.fetchone()['c']
+    elif session.get("cliente_sala"):
+        # Cliente: Conta mensagens do Admin na sua sala
+        cur.execute("""
+            SELECT COUNT(*) as c FROM mensagens 
+            WHERE sala = %s AND remetente_tipo = 'admin' AND id > %s
+        """, (session["cliente_sala"], ultimo_id))
+        novas = cur.fetchone()['c']
+
+    return {"novas": novas}
+
+
 # ======================= ARRANQUE =======================
 with app.app_context():
     init_db()

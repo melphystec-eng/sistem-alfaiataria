@@ -61,12 +61,18 @@ async function carregarMensagens() {
 
     if (data.mensagens.length > 0) {
       chatBox.innerHTML = data.mensagens.map(m => criarBalao(m, data.meu_tipo)).join('');
-      chatBox.scrollTop = chatBox.scrollHeight; // Rola para o fundo
+      chatBox.scrollTop = chatBox.scrollHeight;
+
+      // GUARDAR O ID DA ÚLTIMA MENSAGEM (Para limpar o alerta vermelho)
+      const ultimoId = data.mensagens[data.mensagens.length - 1].id;
+      localStorage.setItem('chat_last_id_cliente_' + sala, ultimoId);
+
     } else {
       chatBox.innerHTML = '<div style="text-align:center; color: #94a3b8; margin-top: 20px;"><i class="fa-regular fa-comments" style="font-size: 2rem; margin-bottom: 10px;"></i><br>Olá! Como podemos ajudar hoje?</div>';
     }
   } catch (e) {}
 }
+
 
 async function enviarMensagem() {
   const texto = input.value.trim();
@@ -86,5 +92,6 @@ async function enviarMensagem() {
 // Carrega ao abrir e depois a cada 3 segundos
 carregarMensagens();
 setInterval(carregarMensagens, 3000);
+
 </script>
 {% endblock %}

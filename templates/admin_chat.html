@@ -95,11 +95,17 @@ async function carregarMensagensAdmin() {
     if (data.mensagens.length > 0) {
       chatBox.innerHTML = data.mensagens.map(m => criarBalao(m, data.meu_tipo)).join('');
       chatBox.scrollTop = chatBox.scrollHeight;
+
+      // GUARDAR O ID DA ÚLTIMA MENSAGEM (Para limpar o alerta vermelho no admin)
+      const ultimoId = data.mensagens[data.mensagens.length - 1].id;
+      localStorage.setItem('chat_last_id_admin', ultimoId);
+
     } else {
       chatBox.innerHTML = '<div style="text-align:center; color: #94a3b8; margin-top: 20px;">Sem mensagens nesta sala.</div>';
     }
   } catch (e) {}
 }
+
 
 async function enviarMensagemAdmin() {
   const texto = input.value.trim();
