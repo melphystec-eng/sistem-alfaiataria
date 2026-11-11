@@ -680,29 +680,6 @@ def api_chat_enviar():
 
 @app.route("/api/chat/receber/<sala>")
 def api_chat_receber(sala):
-    # Segurança: O cliente só pode ler a sua própria sala
-    if sala.startswith("cliente_") and not session.get("admin_id"):
-        if session.get("cliente_sala") != sala:
-            return {"status": "erro", "msg": "Acesso negado"}, 403
-
-    db = get_db()
-    cur = db.cursor()
-    cur.execute("SELECT * FROM mensagens WHERE sala=%s ORDER BY criada_em ASC", (sala,))
-    msgs = cur.fetchall()
-
-    resultado = []
-    for m in msgs:
-        resultado.append({
-            "tipo": m["remetente_tipo"],
-            "nome": m["remetente_nome"],
-            "mensagem": m["mensagem"],
-            "hora": m["criada_em"].strftime("%H:%M")
-        })
-    return {"mensagens": resultado, "meu_tipo": "admin" if session.get("admin_id") else "cliente"}
-
-
-@app.route("/api/chat/receber/<sala>")
-def api_chat_receber(sala):
     if sala.startswith("cliente_") and not session.get("admin_id"):
         if session.get("cliente_sala") != sala:
             return {"status": "erro", "msg": "Acesso negado"}, 403
