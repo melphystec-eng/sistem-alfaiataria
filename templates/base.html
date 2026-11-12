@@ -702,39 +702,37 @@ h1::after {
     });
   });
 
-   // ================= VERIFICADOR DE NOTIFICAÇÕES DO CHAT =================
+     // ================= VERIFICADOR DE NOTIFICAÇÕES DO CHAT =================
   const badge = document.getElementById('chat-badge-notificacao');
+  const btnChat = document.getElementById('btn-chat-flutuante');
 
-  if (badge) {
-    // Cria uma chave única para o browser saber quem está a ver
-    const isAdmin = "{{ 'true' if session.get('admin_id') else 'false' }}" === "true";
-    const chaveLocal = isAdmin ? 'chat_last_id_admin' : 'chat_last_id_cliente_' + "{{ session.get('cliente_sala', '') }}";
+  if (badge && btnChat) {
+    // 1. Esconder o botão do chat se estivermos na página de chat
+    if (window.location.pathname.includes('/chat') || window.location.pathname.includes('/contacto')) {
+      btnChat.style.display = 'none';
+    } else {
+      // 2. Se não estivermos no chat, verificar notificações
+      const isAdmin = "{{ 'true' if session.get('admin_id') else 'false' }}" === "true";
+      const chaveLocal = isAdmin ? 'chat_last_id_admin' : 'chat_last_id_cliente_' + "{{ session.get('cliente_sala', '') }}";
 
-    async function verificarNovasMensagens() {
-      // Se já estiver na página do chat, esconde a bolinha
-      if (window.location.pathname.includes('/chat') || window.location.pathname.includes('/contacto')) {
-        badge.style.display = 'none';
-        return;
+      async function verificarNovasMensagens() {
+        let ultimoIdVisto = localStorage.getItem(chaveLocal) || 0;
+        try {
+          const response = await fetch(`/api/chat/verificar_novas?ultimo_id=${ultimoIdVisto}`);
+          const data = await response.json();
+
+          if (data.novas > 0) {
+            badge.innerText = data.novas > 9 ? "9+" : data.novas;
+            badge.style.display = 'flex';
+          } else {
+            badge.style.display = 'none';
+          }
+        } catch (e) {}
       }
 
-      let ultimoIdVisto = localStorage.getItem(chaveLocal) || 0;
-
-      try {
-        const response = await fetch(`/api/chat/verificar_novas?ultimo_id=${ultimoIdVisto}`);
-        const data = await response.json();
-
-        if (data.novas > 0) {
-          badge.innerText = data.novas > 9 ? "9+" : data.novas;
-          badge.style.display = 'flex';
-        } else {
-          badge.style.display = 'none';
-        }
-      } catch (e) {}
+      setInterval(verificarNovasMensagens, 5000);
+      verificarNovasMensagens();
     }
-
-    // Verifica a cada 5 segundos
-    setInterval(verificarNovasMensagens, 5000);
-    verificarNovasMensagens(); // Verifica logo ao abrir
   }
 
 </script>
