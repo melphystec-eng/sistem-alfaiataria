@@ -527,8 +527,9 @@ def admin_admin_novo():
 
         cur.execute(
             "INSERT INTO admin(username, password_hash, ativo, is_super, criado_por, criado_em) "
-            "VALUES (%s, %s, TRUE, FALSE, %s, %s)",
-            (u, generate_password_hash(p), session["admin_id"], datetime.now()))
+            "VALUES (%s, %s, %s, %s, %s, %s)",
+            (u, generate_password_hash(p), True, False, session["admin_id"], datetime.now())
+        )
         db.commit()
         registar_log("admin_criado", f"novo_admin={u}")
         flash(f"Administrador '{u}' criado.")
@@ -559,13 +560,17 @@ def admin_bloquear(id):
         flash("Só pode bloquear administradores que criou.")
         return redirect(url_for("admin_admins"))
 
-    novo = not alvo["ativo"]  # Inverte o valor booleano
-    cur.execute("UPDATE admin SET ativo=%s WHERE id=%s", (novo, id))
+    # Inverte o estado atual (Se está True, passa a False)
+    novo_estado = not alvo["ativo"]
+
+    cur.execute("UPDATE admin SET ativo=%s WHERE id=%s", (novo_estado, id))
     db.commit()
 
-    acao = "admin_desbloqueio" if novo else "admin_bloqueio"
+    acao = "admin_desbloqueio" if novo_estado else "admin_bloqueio"
     registar_log(acao, f"alvo={alvo['username']}")
-    flash(f"Admin '{alvo['username']}' {'desbloqueado' if novo else 'bloqueado'}.")
+
+    status_msg = "desbloqueado" if novo_estado else "bloqueado"
+    flash(f"Admin '{alvo['username']}' {status_msg} com sucesso.")
     return redirect(url_for("admin_admins"))
 
 
