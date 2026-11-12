@@ -703,16 +703,16 @@ h1::after {
     });
   });
 
-     // ================= VERIFICADOR DE NOTIFICAÇÕES DO CHAT =================
+   // ================= VERIFICADOR DE NOTIFICAÇÕES DO CHAT =================
   const badge = document.getElementById('chat-badge-notificacao');
   const btnChat = document.getElementById('btn-chat-flutuante');
 
   if (badge && btnChat) {
-    // 1. Esconder o botão do chat se estivermos na página de chat
+    // 1. Se estiver na página de contacto ou chat do admin, esconde apenas este botão
     if (window.location.pathname.includes('/chat') || window.location.pathname.includes('/contacto')) {
       btnChat.style.display = 'none';
     } else {
-      // 2. Se não estivermos no chat, verificar notificações
+      // 2. Se não estiver no chat, verifica notificações
       const isAdmin = "{{ 'true' if session.get('admin_id') else 'false' }}" === "true";
       const chaveLocal = isAdmin ? 'chat_last_id_admin' : 'chat_last_id_cliente_' + "{{ session.get('cliente_sala', '') }}";
 

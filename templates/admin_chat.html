@@ -8,7 +8,6 @@
     display: flex;
     gap: 15px;
     height: calc(100vh - 120px);
-    position: relative;
   }
 
   /* Barra lateral (Lista de Conversas) */
@@ -20,6 +19,7 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    flex-shrink: 0;
   }
 
   /* Área Principal (Mensagens) */
@@ -31,65 +31,61 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    min-width: 0; /* Impede que o chat esmague a barra lateral */
   }
 
   /* --- RESPONSIVIDADE (TELEMÓVEL) --- */
   @media (max-width: 768px) {
-    .admin-chat-layout { height: calc(100vh - 130px); gap: 0; }
-
-    /* No telemóvel, a lista esconde-se por defeito */
-    .chat-sidebar {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      z-index: 10;
-      transform: translateX(-100%);
-      transition: transform 0.3s ease;
-      border-radius: 0;
+    .admin-chat-layout {
+      height: calc(100vh - 130px);
+      gap: 8px; /* Espaço pequeno entre a lista e o chat */
     }
 
-    /* Quando adicionamos a classe .aberto, a lista aparece */
-    .chat-sidebar.aberto { transform: translateX(0); }
+    /* A LISTA FICA MUITO MAIS FINA NO TELEMÓVEL */
+    .chat-sidebar {
+      width: 90px;
+      border-radius: 8px;
+    }
 
-    .chat-main { width: 100%; border-radius: 0; }
+    .chat-sidebar h3 { font-size: 0.9rem; margin: 0; } /* Título mais pequeno */
+    .sala-item { padding: 10px 5px !important; flex-direction: column; text-align: center; gap: 5px !important; }
+    .sala-item i { font-size: 1.5rem !important; margin-bottom: 2px; }
+    .sala-item b { font-size: 0.7rem; }
+    .sala-item small { display: none; } /* Esconde o número da sala para não quebrar */
 
-    /* O botão de voltar/menu só aparece no telemóvel */
-    .btn-menu-mobile { display: block !important; }
+    .chat-main {
+      border-radius: 8px;
+    }
+
+    .msg-balao { max-width: 90% !important; font-size: 0.9rem !important; }
   }
-
-  .btn-menu-mobile { display: none; }
-  .sala-item:hover { background: #f1f5f9 !important; }
 </style>
 
 <div class="admin-chat-layout">
 
   <!-- Barra Lateral de Conversas -->
-  <div class="chat-sidebar" id="sidebar">
-    <div style="padding: 15px; background: var(--azul-esc); color: white; display: flex; justify-content: space-between; align-items: center;">
-      <h3 style="margin: 0; font-size: 1.1rem;"><i class="fa-solid fa-comments"></i> Conversas</h3>
-      <!-- Botão para fechar a lista no telemóvel -->
-      <button class="btn-menu-mobile" onclick="toggleSidebar()" style="background: transparent; padding: 0; min-height: auto; color: white; box-shadow: none;">
-        <i class="fa-solid fa-xmark" style="font-size: 1.2rem;"></i>
-      </button>
+  <div class="chat-sidebar">
+    <div style="padding: 12px; background: var(--azul-esc); color: white; text-align: center;">
+      <h3 style="margin: 0; font-size: 1rem;"><i class="fa-solid fa-comments"></i></h3>
     </div>
 
     <div style="overflow-y: auto; flex: 1;">
       <!-- Sala Geral -->
-      <div onclick="mudarSala('geral_admins', 'Admins (Geral)')" class="sala-item" data-sala="geral_admins" style="padding: 15px; border-bottom: 1px solid var(--cinza-100); cursor: pointer; display: flex; align-items: center; gap: 10px;">
+      <div onclick="mudarSala('geral_admins', 'Admins (Geral)')" class="sala-item" data-sala="geral_admins" style="padding: 15px 10px; border-bottom: 1px solid var(--cinza-100); cursor: pointer; display: flex; align-items: center; gap: 10px;">
         <i class="fa-solid fa-users-gear" style="color: var(--azul); font-size: 1.2rem;"></i>
         <div>
-          <b style="display: block; color: var(--preto);">Admins (Geral)</b>
-          <small style="color: var(--cinza-500);">Conversa interna</small>
+          <b style="display: block; color: var(--preto); font-size: 0.9rem;">Admins</b>
+          <small style="color: var(--cinza-500); font-size: 0.7rem;">Geral</small>
         </div>
       </div>
 
       <!-- Salas dos Clientes -->
       {% for s in salas_clientes %}
-      <div onclick="mudarSala('{{ s }}', 'Cliente {{ s.replace('cliente_', '#') }}')" class="sala-item" data-sala="{{ s }}" style="padding: 15px; border-bottom: 1px solid var(--cinza-100); cursor: pointer; display: flex; align-items: center; gap: 10px;">
+      <div onclick="mudarSala('{{ s }}', 'Cliente {{ s.replace('cliente_', '#') }}')" class="sala-item" data-sala="{{ s }}" style="padding: 15px 10px; border-bottom: 1px solid var(--cinza-100); cursor: pointer; display: flex; align-items: center; gap: 10px;">
         <i class="fa-solid fa-user" style="color: var(--cinza-500); font-size: 1.2rem;"></i>
         <div>
-          <b style="display: block; color: var(--preto);">Cliente</b>
-          <small style="color: var(--cinza-500);">{{ s.replace('cliente_', '#') }}</small>
+          <b style="display: block; color: var(--preto); font-size: 0.9rem;">Cliente</b>
+          <small style="color: var(--cinza-500); font-size: 0.7rem;">{{ s.replace('cliente_', '#') }}</small>
         </div>
       </div>
       {% endfor %}
@@ -98,21 +94,17 @@
 
   <!-- Área Principal do Chat -->
   <div class="chat-main">
-    <div style="padding: 15px; background: var(--cinza-100); border-bottom: 1px solid var(--cinza-300); display: flex; align-items: center; gap: 10px;">
-      <!-- Botão para abrir a lista no telemóvel -->
-      <button class="btn-menu-mobile" onclick="toggleSidebar()" style="background: transparent; padding: 0; min-height: auto; color: var(--azul); box-shadow: none; margin-right: 5px;">
-        <i class="fa-solid fa-bars" style="font-size: 1.2rem;"></i>
-      </button>
-      <h3 id="titulo-sala" style="margin: 0; color: var(--preto); font-size: 1.1rem;">Admins (Geral)</h3>
+    <div style="padding: 15px; background: var(--cinza-100); border-bottom: 1px solid var(--cinza-300);">
+      <h3 id="titulo-sala" style="margin: 0; color: var(--preto); font-size: 1rem;">Admins (Geral)</h3>
     </div>
 
-    <div id="admin-chat-box" style="flex: 1; padding: 15px; overflow-y: auto; background: #f8fafc; display: flex; flex-direction: column; gap: 10px;">
+    <div id="admin-chat-box" style="flex: 1; padding: 10px; overflow-y: auto; background: #f8fafc; display: flex; flex-direction: column; gap: 10px;">
       <!-- Mensagens -->
     </div>
 
     <div style="padding: 10px; background: white; border-top: 1px solid var(--cinza-100); display: flex; gap: 8px;">
-      <input type="text" id="admin-chat-input" placeholder="Escreva a sua mensagem..." style="margin: 0; flex: 1; font-size: 15px;" onkeypress="if(event.key === 'Enter') enviarMensagemAdmin()">
-      <button onclick="enviarMensagemAdmin()" style="width: 50px; min-width: 50px; padding: 0;"><i class="fa-solid fa-paper-plane"></i></button>
+      <input type="text" id="admin-chat-input" placeholder="Escreva..." style="margin: 0; flex: 1; font-size: 15px;" onkeypress="if(event.key === 'Enter') enviarMensagemAdmin()">
+      <button onclick="enviarMensagemAdmin()" style="width: 45px; min-width: 45px; padding: 0;"><i class="fa-solid fa-paper-plane"></i></button>
     </div>
   </div>
 
@@ -123,24 +115,16 @@ let salaAtual = 'geral_admins';
 const chatBox = document.getElementById('admin-chat-box');
 const input = document.getElementById('admin-chat-input');
 const titulo = document.getElementById('titulo-sala');
-const sidebar = document.getElementById('sidebar');
-
-function toggleSidebar() {
-  sidebar.classList.toggle('aberto');
-}
 
 function mudarSala(novaSala, novoTitulo) {
   salaAtual = novaSala;
   titulo.innerText = novoTitulo;
 
-  // Destacar item selecionado
   document.querySelectorAll('.sala-item').forEach(el => {
     el.style.background = el.dataset.sala === novaSala ? '#e0f2fe' : 'transparent';
   });
 
   chatBox.innerHTML = '';
-  if (window.innerWidth <= 768) toggleSidebar(); // Fecha a gaveta no telemóvel
-
   carregarMensagensAdmin();
 }
 
@@ -152,12 +136,12 @@ function criarBalao(msg, meuTipo) {
   const radius = isMeu ? '15px 15px 0 15px' : '15px 15px 15px 0';
 
   return `
-    <div style="display: flex; flex-direction: column; align-items: ${alinhamento}; max-width: 85%; align-self: ${alinhamento};">
-      ${!isMeu ? `<small style="color: var(--cinza-500); margin-bottom: 2px; font-size: 0.75rem;">${msg.nome}</small>` : ''}
-      <div style="background: ${corFundo}; color: ${corTexto}; padding: 10px 15px; border-radius: ${radius}; box-shadow: 0 1px 2px rgba(0,0,0,0.1); font-size: 0.95rem; word-break: break-word;">
+    <div class="msg-balao" style="display: flex; flex-direction: column; align-items: ${alinhamento}; max-width: 85%; align-self: ${alinhamento};">
+      ${!isMeu ? `<small style="color: var(--cinza-500); margin-bottom: 2px; font-size: 0.7rem;">${msg.nome}</small>` : ''}
+      <div style="background: ${corFundo}; color: ${corTexto}; padding: 8px 12px; border-radius: ${radius}; box-shadow: 0 1px 2px rgba(0,0,0,0.1); font-size: 0.9rem; word-break: break-word;">
         ${msg.mensagem}
       </div>
-      <small style="color: var(--cinza-500); font-size: 0.65rem; margin-top: 4px;">${msg.hora}</small>
+      <small style="color: var(--cinza-500); font-size: 0.6rem; margin-top: 4px;">${msg.hora}</small>
     </div>
   `;
 }
@@ -174,7 +158,7 @@ async function carregarMensagensAdmin() {
       const ultimoId = data.mensagens[data.mensagens.length - 1].id;
       localStorage.setItem('chat_last_id_admin', ultimoId);
     } else {
-      chatBox.innerHTML = '<div style="text-align:center; color: #94a3b8; margin-top: 20px;">Sem mensagens nesta sala.</div>';
+      chatBox.innerHTML = '<div style="text-align:center; color: #94a3b8; margin-top: 20px; font-size: 0.85rem;">Sem mensagens.</div>';
     }
   } catch (e) {}
 }
