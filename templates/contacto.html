@@ -2,27 +2,7 @@
 {% block title %}Contacto - Chat{% endblock %}
 
 {% block content %}
-<style>
-  /* Esconde os botões flutuantes na página de chat */
-  .fab-container { display: none !important; }
-
-  /* Ajusta a altura do chat para telemóvel e PC */
-  .chat-wrapper {
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 0;
-    overflow: hidden;
-    height: calc(100vh - 140px);
-    display: flex;
-    flex-direction: column;
-  }
-
-  @media (max-width: 768px) {
-    .chat-wrapper { height: calc(100dvh - 130px); } /* 100dvh resolve o problema do teclado no Android */
-  }
-</style>
-
-<div class="card chat-wrapper">
+<div class="card" style="max-width: 600px; margin: 0 auto; padding: 0; overflow: hidden; height: 75vh; display: flex; flex-direction: column;">
 
   <!-- Cabeçalho do Chat -->
   <div style="background: linear-gradient(135deg, var(--azul-esc) 0%, var(--azul) 100%); padding: 15px 20px; color: white; display: flex; align-items: center; gap: 15px;">
@@ -30,20 +10,20 @@
       <i class="fa-solid fa-headset" style="font-size: 1.2rem;"></i>
     </div>
     <div>
-      <h2 style="margin: 0; color: white; font-size: 1.1rem;">Suporte Alfaiataria</h2>
-      <small style="color: #dbeafe; font-size: 0.8rem;">Normalmente responde em minutos</small>
+      <h2 style="margin: 0; color: white; font-size: 1.2rem;">Suporte Alfaiataria</h2>
+      <small style="color: #dbeafe;">Normalmente responde em minutos</small>
     </div>
   </div>
 
   <!-- Área das Mensagens -->
-  <div id="chat-box" style="flex: 1; padding: 15px; overflow-y: auto; background: #f8fafc; display: flex; flex-direction: column; gap: 10px;">
+  <div id="chat-box" style="flex: 1; padding: 20px; overflow-y: auto; background: #f8fafc; display: flex; flex-direction: column; gap: 10px;">
     <!-- As mensagens aparecem aqui -->
   </div>
 
   <!-- Input de Envio -->
-  <div style="padding: 10px; background: white; border-top: 1px solid var(--cinza-100); display: flex; gap: 8px;">
-    <input type="text" id="chat-input" placeholder="Escreva a sua mensagem..." style="margin: 0; border-radius: 20px; flex: 1; background: #f1f5f9; font-size: 14px;" onkeypress="if(event.key === 'Enter') enviarMensagem()">
-    <button onclick="enviarMensagem()" style="border-radius: 50%; width: 45px; min-width: 45px; height: 45px; padding: 0; min-height: 45px;">
+  <div style="padding: 15px; background: white; border-top: 1px solid var(--cinza-100); display: flex; gap: 10px;">
+    <input type="text" id="chat-input" placeholder="Escreva a sua mensagem..." style="margin: 0; border-radius: 20px; flex: 1; background: #f1f5f9;" onkeypress="if(event.key === 'Enter') enviarMensagem()">
+    <button onclick="enviarMensagem()" style="border-radius: 50%; width: 45px; height: 45px; padding: 0; min-height: 45px;">
       <i class="fa-solid fa-paper-plane"></i>
     </button>
   </div>
@@ -62,9 +42,9 @@ function criarBalao(msg, meuTipo) {
   const radius = isMeu ? '15px 15px 0 15px' : '15px 15px 15px 0';
 
   return `
-    <div style="display: flex; flex-direction: column; align-items: ${alinhamento}; max-width: 85%; align-self: ${alinhamento};">
+    <div style="display: flex; flex-direction: column; align-items: ${alinhamento}; max-width: 80%; align-self: ${alinhamento};">
       ${!isMeu ? `<small style="color: var(--cinza-500); margin-bottom: 2px; font-size: 0.75rem;">${msg.nome}</small>` : ''}
-      <div style="background: ${corFundo}; color: ${corTexto}; padding: 10px 15px; border-radius: ${radius}; box-shadow: 0 1px 2px rgba(0,0,0,0.1); font-size: 0.95rem; word-break: break-word;">
+      <div style="background: ${corFundo}; color: ${corTexto}; padding: 10px 15px; border-radius: ${radius}; box-shadow: 0 1px 2px rgba(0,0,0,0.1); font-size: 0.95rem;">
         ${msg.mensagem}
       </div>
       <small style="color: var(--cinza-500); font-size: 0.65rem; margin-top: 4px;">${msg.hora}</small>
@@ -83,6 +63,7 @@ async function carregarMensagens() {
       chatBox.innerHTML = data.mensagens.map(m => criarBalao(m, data.meu_tipo)).join('');
       chatBox.scrollTop = chatBox.scrollHeight;
 
+      // GUARDAR O ID DA ÚLTIMA MENSAGEM (Para limpar o alerta vermelho)
       const ultimoId = data.mensagens[data.mensagens.length - 1].id;
       localStorage.setItem('chat_last_id_cliente_' + sala, ultimoId);
 
@@ -91,6 +72,7 @@ async function carregarMensagens() {
     }
   } catch (e) {}
 }
+
 
 async function enviarMensagem() {
   const texto = input.value.trim();
@@ -107,7 +89,9 @@ async function enviarMensagem() {
   carregarMensagens();
 }
 
+// Carrega ao abrir e depois a cada 3 segundos
 carregarMensagens();
 setInterval(carregarMensagens, 3000);
+
 </script>
 {% endblock %}
