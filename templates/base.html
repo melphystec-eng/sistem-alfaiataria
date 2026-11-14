@@ -589,6 +589,10 @@ h1::after {
   70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
   100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
 }
+/* Esconde a barra inteira de botões (Chat, Whatsapp, Telefone) quando estamos no chat */
+body.no-chat .fab-container {
+  display: none !important;
+}
 
 </style>
 </head>
@@ -733,6 +737,11 @@ h1::after {
     setInterval(verificarNovasMensagens, 5000);
     verificarNovasMensagens();
   }
+  // Se estiver na página de chat, esconde todos os botões flutuantes
+if (window.location.pathname.includes('/chat') || window.location.pathname.includes('/contacto')) {
+  document.body.classList.add('no-chat');
+}
+
 </script>
 </body>
 </html>
