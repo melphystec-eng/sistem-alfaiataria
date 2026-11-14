@@ -38,20 +38,13 @@
     <p style="margin: 0 0 10px 0; font-size: 0.9rem; color: var(--azul-esc); font-weight: 600;">
       <i class="fa-solid fa-id-card"></i> Para um melhor atendimento, informe o seu nome e telefone:
     </p>
-    <div style="display: flex; gap: 10px;">
-      <input type="text" id="input-nome" placeholder="Nome e Telefone (ex: Mário, 923...)" style="margin: 0; flex: 1; font-size: 14px;">
-      <button onclick="guardarIdentificacao()" style="padding: 0 15px; font-size: 0.85rem;">Guardar</button>
+
+  <!-- Aqui está o truque: O input tem flex:1 (ocupa o espaço todo) e o botão tem width: auto -->
+    <div style="display: flex; gap: 8px; align-items: stretch;">
+      <input type="text" id="input-nome" placeholder="Ex: Mário, 923..." style="margin: 0; flex: 1; min-width: 0; font-size: 14px; padding: 10px 12px; height: 44px;">
+      <button onclick="guardarIdentificacao()" style="margin: 0; width: auto; min-width: 90px; padding: 0 15px; height: 44px; font-size: 0.9rem;">Guardar</button>
     </div>
   </div>
-
-  <!-- Input de Envio -->
-  <div style="padding: 10px; background: white; border-top: 1px solid var(--cinza-100); display: flex; gap: 8px;">
-    <input type="text" id="chat-input" placeholder="Escreva a sua mensagem..." style="margin: 0; border-radius: 20px; flex: 1; background: #f1f5f9; font-size: 14px;" onkeypress="if(event.key === 'Enter') enviarMensagem()">
-    <button onclick="enviarMensagem()" style="border-radius: 50%; width: 45px; min-width: 45px; height: 45px; padding: 0; min-height: 45px;">
-      <i class="fa-solid fa-paper-plane"></i>
-    </button>
-  </div>
-</div>
 
 <script>
 const sala = "{{ session.get('cliente_sala') }}";
