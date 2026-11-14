@@ -1,9 +1,10 @@
 {% extends "base.html" %}{% block title %}Novo Pedido{% endblock %}
 {% block content %}
-<div class="card" style="max-width: 700px; margin: 0 auto;">
+<div class="card" style="max-width: 750px; margin: 0 auto;">
   <h1><i class="fa-solid fa-cart-plus" style="color: var(--azul);"></i> Registar Pedido</h1>
   <form method="post">
 
+    <!-- Linha 1: Cliente e Contacto -->
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
       <div class="form-group">
         <label><i class="fa-solid fa-user"></i> Cliente</label>
@@ -15,14 +16,45 @@
       </div>
     </div>
 
+    <!-- Linha 2: Descrição -->
     <div class="form-group">
       <label><i class="fa-solid fa-shirt"></i> Descrição do Pedido</label>
       <textarea name="descricao" rows="3" required placeholder="Detalhes da peça, medidas, cor, etc."></textarea>
     </div>
 
-    <div class="form-group">
-      <label><i class="fa-solid fa-money-bill-wave"></i> Preço (Kz)</label>
-      <input type="number" step="0.01" name="preco" required placeholder="0.00">
+    <!-- Linha 3: Responsáveis -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+      <div class="form-group">
+        <label><i class="fa-solid fa-scissors"></i> Estilista Responsável</label>
+        <input name="estilista" required placeholder="Nome do estilista">
+      </div>
+      <div class="form-group">
+        <label><i class="fa-solid fa-user-tie"></i> Atendido por (Admin)</label>
+        <select name="atendente" required>
+          {% for adm in lista_admins %}
+          <option value="{{ adm }}" {% if adm == session.admin_user %}selected{% endif %}>{{ adm }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+
+    <!-- Linha 4: Financeiro -->
+    <div style="background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid var(--cinza-300); margin-bottom: 20px;">
+      <h3 style="margin: 0 0 10px 0; font-size: 1rem; color: var(--azul-esc);"><i class="fa-solid fa-money-bill-wave"></i> Valores</h3>
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+        <div class="form-group" style="margin: 0;">
+          <label>Preço Total (Kz)</label>
+          <input type="number" step="0.01" name="preco" id="preco" required placeholder="0.00" oninput="calcularFalta()">
+        </div>
+        <div class="form-group" style="margin: 0;">
+          <label>Valor Entregue (Kz)</label>
+          <input type="number" step="0.01" name="valor_entregue" id="valor_entregue" placeholder="0.00" value="0" oninput="calcularFalta()">
+        </div>
+        <div class="form-group" style="margin: 0;">
+          <label>Valor em Falta</label>
+          <input type="text" id="valor_falta_display" readonly style="background: #e2e8f0; font-weight: bold; color: #dc2626;" value="0.00">
+        </div>
+      </div>
     </div>
 
     <div style="display: flex; gap: 10px; margin-top: 25px;">
@@ -31,4 +63,21 @@
     </div>
   </form>
 </div>
+
+<script>
+  function calcularFalta() {
+    const preco = parseFloat(document.getElementById('preco').value) || 0;
+    const entregue = parseFloat(document.getElementById('valor_entregue').value) || 0;
+    const falta = preco - entregue;
+
+    const display = document.getElementById('valor_falta_display');
+    if (falta > 0) {
+      display.value = falta.toFixed(2);
+      display.style.color = '#dc2626'; // Vermelho
+    } else {
+      display.value = "0.00 (Pago)";
+      display.style.color = '#16a34a'; // Verde
+    }
+  }
+</script>
 {% endblock %}

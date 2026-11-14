@@ -7,15 +7,45 @@
 
 <table>
 <thead>
-  <tr><th>Código</th><th>Cliente</th><th>Preço</th><th>Estado</th><th style="text-align: right;">Ação</th></tr>
+  <tr>
+    <th>Código / Cliente</th>
+    <th>Responsáveis</th>
+    <th>Financeiro</th>
+    <th>Estado</th>
+    <th style="text-align: right;">Ação</th>
+  </tr>
 </thead>
 <tbody>
 {% for p in pedidos %}
 <tr>
-  <td data-label="Código"><b>{{ p.codigo }}</b></td>
-  <td data-label="Cliente">{{ p.cliente }}</td>
-  <td data-label="Preço">{{ "%.2f"|format(p.preco) }} Kz</td>
-  <td data-label="Estado"><span class="estado {{ p.estado }}">{{ p.estado }}</span></td>
+  <!-- Código e Cliente -->
+  <td data-label="Código/Cliente">
+    <b style="color: var(--azul-esc);">{{ p.codigo }}</b><br>
+    <small>{{ p.cliente }}</small>
+  </td>
+
+  <!-- Responsáveis -->
+  <td data-label="Responsáveis">
+    <small><i class="fa-solid fa-scissors"></i> Estilista: <b>{{ p.estilista or '—' }}</b></small><br>
+    <small><i class="fa-solid fa-user-tie"></i> Atendido: <b>{{ p.atendente or '—' }}</b></small>
+  </td>
+
+  <!-- Financeiro -->
+  <td data-label="Financeiro">
+    <small>Total: <b>{{ "%.2f"|format(p.preco) }} Kz</b></small><br>
+    <small>Entregue: <b style="color: #16a34a;">{{ "%.2f"|format(p.valor_entregue or 0) }} Kz</b></small><br>
+    {% set falta = p.preco - (p.valor_entregue or 0) %}
+    {% if falta > 0 %}
+      <small>Falta: <b style="color: #dc2626;">{{ "%.2f"|format(falta) }} Kz</b></small>
+    {% else %}
+      <small><b style="color: #16a34a;"><i class="fa-solid fa-check"></i> Pago</b></small>
+    {% endif %}
+  </td>
+
+  <!-- Estado e Ação -->
+  <td data-label="Estado">
+    <span class="estado {{ p.estado }}">{{ p.estado }}</span>
+  </td>
   <td data-label="Ação" style="text-align: right;">
     <form method="post" action="{{ url_for('admin_pedido_estado', id=p.id) }}" style="display:flex; gap:6px; justify-content: flex-end; align-items: center;">
       <select name="estado" style="width: auto; padding: 6px 10px; font-size: 0.85rem; height: 36px; margin: 0;">

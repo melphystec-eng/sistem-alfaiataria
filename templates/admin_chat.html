@@ -82,13 +82,13 @@
         </div>
       </div>
 
-      <!-- Salas dos Clientes -->
+            <!-- Salas dos Clientes -->
       {% for s in salas_clientes %}
-      <div onclick="mudarSala('{{ s }}', 'Cliente {{ s.replace('cliente_', '#') }}')" class="sala-item" data-sala="{{ s }}" style="padding: 15px 10px; border-bottom: 1px solid var(--cinza-100); cursor: pointer; display: flex; align-items: center; gap: 10px;">
+      <div onclick="mudarSala('{{ s.sala }}', '{{ s.remetente_nome }}')" class="sala-item" data-sala="{{ s.sala }}" style="padding: 15px 10px; border-bottom: 1px solid var(--cinza-100); cursor: pointer; display: flex; align-items: center; gap: 10px;">
         <i class="fa-solid fa-user" style="color: var(--cinza-500); font-size: 1.2rem;"></i>
-        <div>
-          <b style="display: block; color: var(--preto); font-size: 0.9rem;">Cliente</b>
-          <small style="color: var(--cinza-500); font-size: 0.7rem;">{{ s.replace('cliente_', '#') }}</small>
+        <div style="overflow: hidden;">
+          <b style="display: block; color: var(--preto); font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ s.remetente_nome }}</b>
+          <small style="color: var(--cinza-500); font-size: 0.7rem;">{{ s.sala.replace('cliente_', '#') }}</small>
         </div>
       </div>
       {% endfor %}

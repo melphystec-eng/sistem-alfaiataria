@@ -59,6 +59,14 @@
         <p style="margin-bottom: 8px;"><b><i class="fa-solid fa-shirt" style="width:20px; color:var(--cinza-500)"></i> Descrição:</b> {{ pedido.descricao }}</p>
         <p style="margin-bottom: 8px;"><b><i class="fa-solid fa-money-bill" style="width:20px; color:var(--cinza-500)"></i> Preço:</b> {{ "%.2f"|format(pedido.preco) }} Kz</p>
         <p style="margin-bottom: 8px;"><b><i class="fa-solid fa-circle-info" style="width:20px; color:var(--cinza-500)"></i> Estado:</b> <span class="estado {{ pedido.estado }}">{{ pedido.estado }}</span></p>
+        <p style="margin-bottom: 8px;"><b><i class="fa-solid fa-scissors" style="width:20px; color:var(--cinza-500)"></i> Estilista:</b> {{ pedido.estilista or 'A definir' }}</p>
+
+        {% set falta = pedido.preco - (pedido.valor_entregue or 0) %}
+        {% if falta > 0 %}
+          <p style="margin-bottom: 8px;"><b><i class="fa-solid fa-wallet" style="width:20px; color:var(--cinza-500)"></i> Valor em Falta:</b> <span style="color: #dc2626; font-weight: bold;">{{ "%.2f"|format(falta) }} Kz</span></p>
+        {% else %}
+          <p style="margin-bottom: 8px;"><b><i class="fa-solid fa-wallet" style="width:20px; color:var(--cinza-500)"></i> Pagamento:</b> <span style="color: #16a34a; font-weight: bold;">Totalmente Pago</span></p>
+        {% endif %}
 
         <!-- AQUI ESTÁ A CORREÇÃO DA DATA -->
         <p style="margin-bottom: 0;"><b><i class="fa-solid fa-calendar" style="width:20px; color:var(--cinza-500)"></i> Data:</b> {{ pedido.criado_em.strftime('%d/%m/%Y %H:%M') }}</p>

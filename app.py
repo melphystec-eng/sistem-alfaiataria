@@ -1,5 +1,5 @@
 import os, secrets
-from datetime import datetime
+from datetime import datetime, timedelta
 from functools import wraps
 
 from flask import (Flask, render_template, request, redirect, url_for,
@@ -422,26 +422,44 @@ def admin_pedidos():
 @app.route("/admin/pedidos/novo", methods=["GET", "POST"])
 @login_required
 def admin_pedido_novo():
+    db = get_db()
+    cur = db.cursor()
+
     if request.method == "POST":
         cliente = request.form["cliente"].strip()
         contacto = request.form.get("contacto", "").strip()
         descricao = request.form["descricao"].strip()
+        estilista = request.form.get("estilista", "").strip()
+        atendente = request.form.get("atendente", "").strip() or session.get("admin_user")
+
         try:
             preco = float(request.form["preco"])
+            valor_entregue = float(request.form.get("valor_entregue") or 0)
         except ValueError:
-            flash("Preço inválido.")
+            flash("Preço ou valor entregue inválido.")
             return redirect(url_for("admin_pedido_novo"))
+
+        # O valor em falta é calculado automaticamente, mas também guardamos
+        valor_em_falta = preco - valor_entregue
+        if valor_em_falta < 0:
+            valor_em_falta = 0  # Se o cliente entregou mais do que o preço, não há falta
+
         codigo = gerar_codigo()
-        db = get_db()
-        cur = db.cursor()
-        cur.execute("""INSERT INTO pedidos(codigo, cliente, contacto, descricao, preco, estado, criado_em)
-                      VALUES (%s, %s, %s, %s, %s, %s, %s)""",
-                    (codigo, cliente, contacto, descricao, preco, "pendente", datetime.now()))
+
+        cur.execute("""INSERT INTO pedidos(codigo, cliente, contacto, descricao, preco, valor_entregue, estilista, atendente, estado, criado_em)
+                      VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
+                    (codigo, cliente, contacto, descricao, preco, valor_entregue, estilista, atendente, "pendente",
+                     datetime.now()))
         db.commit()
         registar_log("pedido_criado", f"codigo={codigo} cliente={cliente} preco={preco}")
         flash(f"Pedido registado. Código do cliente: {codigo}")
         return redirect(url_for("admin_pedidos"))
-    return render_template("admin_pedido_form.html")
+
+    # Se for GET, vamos buscar os admins para preencher o campo "Atendente"
+    cur.execute("SELECT username FROM admin WHERE ativo = True ORDER BY username")
+    lista_admins = [r["username"] for r in cur.fetchall()]
+
+    return render_template("admin_pedido_form.html", lista_admins=lista_admins)
 
 
 @app.route("/admin/pedidos/<int:id>/estado", methods=["POST"])
@@ -636,13 +654,20 @@ def admin_logs():
 import random
 import string
 
+
 @app.route("/contacto")
 def contacto():
-    # Se o cliente ainda não tem uma "sala", criamos uma nova (ex: sala_cliente_A3F9)
+    # Se o cliente ainda não tem uma sala guardada no browser dele
     if "cliente_sala" not in session:
+        # Cria um ID único (ex: cliente_A3F9)
         codigo = ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
         session["cliente_sala"] = f"cliente_{codigo}"
-        session["cliente_nome"] = "Visitante"
+        session["cliente_nome"] = "Cliente"  # Nome padrão
+
+        # Avisa o browser para guardar este ID para sempre (cookie que dura 30 dias)
+        session.permanent = True
+        app.permanent_session_lifetime = timedelta(days=30)
+
     return render_template("contacto.html")
 
 
@@ -651,9 +676,14 @@ def contacto():
 def admin_chat():
     db = get_db()
     cur = db.cursor()
-    # Pega todas as salas de clientes que têm mensagens
-    cur.execute("SELECT DISTINCT sala FROM mensagens WHERE sala LIKE 'cliente_%' ORDER BY sala DESC")
-    salas_clientes = [r["sala"] for r in cur.fetchall()]
+    # Vai buscar as salas e o nome do último remetente que era cliente
+    cur.execute("""
+        SELECT DISTINCT ON (sala) sala, remetente_nome 
+        FROM mensagens 
+        WHERE sala LIKE 'cliente_%' 
+        ORDER BY sala, criada_em DESC
+    """)
+    salas_clientes = cur.fetchall()
     return render_template("admin_chat.html", salas_clientes=salas_clientes)
 
 
@@ -662,16 +692,20 @@ def api_chat_enviar():
     data = request.json
     sala = data.get("sala")
     mensagem = data.get("mensagem", "").strip()
+    nome_cliente = data.get("nome", "").strip()  # NOVO: Recebe o nome/telefone
+
     if not mensagem or not sala:
         return {"status": "erro"}, 400
 
-    # Define quem está a enviar
     if session.get("admin_id"):
         tipo = "admin"
         nome = session.get("admin_user")
     else:
         tipo = "cliente"
-        nome = session.get("cliente_nome", "Visitante")
+        # Se o cliente enviou o nome ou telefone, atualizamos a sessão
+        if nome_cliente:
+            session["cliente_nome"] = nome_cliente
+        nome = session.get("cliente_nome", "Cliente")
 
     db = get_db()
     cur = db.cursor()
@@ -733,6 +767,24 @@ def api_chat_verificar_novas():
 # ======================= ARRANQUE =======================
 with app.app_context():
     init_db()
+
+def atualizar_db():
+    db = get_db()
+    cur = db.cursor()
+    try:
+        # Adiciona a coluna valor_entregue se não existir
+        cur.execute("ALTER TABLE pedidos ADD COLUMN IF NOT EXISTS valor_entregue REAL DEFAULT 0;")
+        # Adiciona a coluna estilista se não existir
+        cur.execute("ALTER TABLE pedidos ADD COLUMN IF NOT EXISTS estilista VARCHAR(150);")
+        # Adiciona a coluna atendente se não existir
+        cur.execute("ALTER TABLE pedidos ADD COLUMN IF NOT EXISTS atendente VARCHAR(150);")
+        db.commit()
+        print("✅ Novas colunas de pedidos adicionadas com sucesso!")
+    except Exception as e:
+        print(f"Erro ao atualizar tabela pedidos: {e}")
+        db.rollback()
+
+atualizar_db()
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
