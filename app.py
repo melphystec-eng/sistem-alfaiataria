@@ -29,9 +29,7 @@ cloudinary.config(
     api_key=os.environ.get("CLOUDINARY_API_KEY"),
     api_secret=os.environ.get("CLOUDINARY_API_SECRET")
 )
-
 ESTADOS = ["pendente", "pronto", "entregue", "cancelado"]
-
 
 # -------- Base de dados (PostgreSQL) --------
 def get_db():
@@ -39,16 +37,31 @@ def get_db():
         db_url = os.environ.get("DATABASE_URL")
         if not db_url:
             raise RuntimeError("A variável DATABASE_URL não está definida.")
-        # RealDictCursor permite aceder aos campos por nome (ex: n['titulo'])
-        g.db = psycopg2.connect(db_url, cursor_factory=RealDictCursor)
-    return g.db
 
+        # Tenta ligar até 3 vezes (útil se o Neon estiver a "acordar")
+        for tentativa in range(3):
+            try:
+                g.db = psycopg2.connect(
+                    db_url,
+                    cursor_factory=RealDictCursor,
+                    connect_timeout=10,
+                    keepalives=1,
+                    keepalives_idle=30,
+                    keepalives_interval=10,
+                    keepalives_count=5
+                )
+                break  # Se conseguiu ligar, sai do loop
+            except psycopg2.OperationalError as e:
+                if tentativa == 2:  # Se falhou as 3 tentativas, lança o erro
+                    raise e
+                import time
+                time.sleep(2)  # Espera 2 segundos antes de tentar novamente
+    return g.db
 
 @app.teardown_appcontext
 def close_db(exc):
     db = g.pop("db", None)
     if db: db.close()
-
 
 def init_db():
     db = get_db()
@@ -784,7 +797,7 @@ def atualizar_db():
         print(f"Erro ao atualizar tabela pedidos: {e}")
         db.rollback()
 
-atualizar_db()
+    atualizar_db()
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
