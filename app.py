@@ -689,14 +689,34 @@ def contacto():
 def admin_chat():
     db = get_db()
     cur = db.cursor()
-    # Vai buscar as salas e o nome do último remetente que era cliente
+
+    # Vai buscar as salas, o nome do cliente, a última mensagem e quem a enviou
     cur.execute("""
-        SELECT DISTINCT ON (sala) sala, remetente_nome 
+        SELECT DISTINCT ON (sala) 
+            sala, 
+            remetente_nome,
+            remetente_tipo,
+            mensagem as ultima_msg,
+            criada_em
         FROM mensagens 
         WHERE sala LIKE 'cliente_%' 
         ORDER BY sala, criada_em DESC
     """)
-    salas_clientes = cur.fetchall()
+    salas = cur.fetchall()
+
+    # Formata os dados para o template
+    salas_clientes = []
+    for s in salas:
+        # Se a última mensagem foi do cliente, significa que o admin ainda não respondeu
+        tem_nova = (s['remetente_tipo'] == 'cliente')
+
+        salas_clientes.append({
+            'sala': s['sala'],
+            'nome': s['remetente_nome'],
+            'ultima_msg': s['ultima_msg'],
+            'tem_nova': tem_nova
+        })
+
     return render_template("admin_chat.html", salas_clientes=salas_clientes)
 
 
